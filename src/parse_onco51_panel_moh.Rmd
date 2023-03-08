@@ -1,0 +1,61 @@
+---
+title: "Parse the list of 51 onco variants from MOH"
+author: "Ofer Isakov"
+date: '2023-03-07'
+output: html_document
+---
+
+A script that takes in the onco 51 variants founder variants list from moh  (downloaded from https://www.health.gov.il/hozer/mr13_2020.pdf)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/')
+library(ProjectTemplate)
+load.project()
+```
+
+```{r onco_fix}
+moh_variants<-readr::read_delim(file = './data/founder_variants_lists/onco_panel_51.csv')
+moh_variants<-moh_variants%>%mutate(gene=trimws(gene))
+# add refseq
+moh_for_mutalyzer<-moh_variants%>%
+  left_join(refseq2gene%>%rename(gene=name2))
+moh_for_mutalyzer<-moh_for_mutalyzer%>%mutate(mutalyzer_input=glue('{X.name}:{variant}'))
+moh_variants_with_hgvs<-NULL
+found_vars<-c()
+for (i in 1:nrow(moh_for_mutalyzer)){
+  is_intronic=F
+  full_variant<-moh_for_mutalyzer[i,]
+  var_base_name<-glue('{full_variant$gene}:{full_variant$variant}')
+  if (var_base_name %in% found_vars){
+    message(glue('Already found {var_base_name}. Skipping..'))
+    next
+  }
+  message(glue('{i}: {paste0(full_variant,collapse = " ")}'))
+  if (grepl('\\+|\\-',full_variant%>%pull(mutalyzer_input))){
+    is_intronic=T
+    message('Intronic variant, adding chr accession..')
+    chr_a<-chr_accessions%>%filter(`#chrom`==full_variant%>%pull(chrom))%>%pull(name)
+    full_variant<-full_variant%>%mutate(mutalyzer_input=stringr::str_replace(glue('{chr_a}({mutalyzer_input}'),':','):'))
+  }
+  variant_for_mutalyzer<-full_variant%>%pull(mutalyzer_input)
+  response<-send_variant_to_mutalyzer_normalize(variant_for_mutalyzer)
+  if (response$status_code!=200){
+    parsed_variant<-data.frame(norm_hgvs=paste0(response$error_details,collapse=' '))
+  }else{
+    parsed_variant<-parse_mutalyzer_normalize_response(response,is_intronic)
+    if ('g_GRCH38' %in% colnames(parsed_variant)){found_vars<-c(found_vars,var_base_name)}# make sure that not only was the variant parsed, but a genomic location was also found
+  }
+  moh_variants_with_hgvs<-moh_variants_with_hgvs%>%
+    bind_rows(data.frame(full_variant,parsed_variant))
+}
+# now need to join the moh_variants with the full list (because you removed duplicates before)
+final_moh_variants<-moh_variants%>%left_join(moh_variants_with_hgvs)
+# now remove the duplicate variants 
+final_moh_variants<-final_moh_variants%>%
+  mutate(base_var=glue('{gene}:{variant}'),
+         is_found=ifelse(!is.na(g_GRCH38),1,0))%>%
+  group_by(base_var,ethnicity)%>%slice_max(order_by = is_found)
+
+write.table(final_moh_variants,file='./output/onco51_moh_panel_202203.csv',sep='\t',row.names=F,quote=F)
+```

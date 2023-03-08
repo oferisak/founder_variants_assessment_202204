@@ -1,0 +1,54 @@
+gene	Mode of Inheritance	variant	protein	protein2	sector	ethnicity	Comment
+BMPR1A	Autosomal dominant	c.-153+13146_*357832del			Jewish	Bukhara	converted using coordinates chr10:88,611,882-89,041,308 [hg19] (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6708668/)
+CHEK2	Autosomal dominant 	c.1100delC	p.Thr367Metfs		Non-Jewish + Jewish		
+MSH2		c.1165C>T	p.Arg389X		Jewish	Moroccan	
+MUTYH	Autosomal Recessive	c.1187G>A	p.Gly396Asp	G396D	Jewish	Moroccan	
+BRCA1		c.1224delA	p.Val409*		Arab		
+MSH2	Autosomal dominant	c.1277-1G>A	IVS7-1G->A		Jewish	Moroccan/Iraq	
+CHEK2	Autosomal dominant 	c.1283C>T	p.Ser428Phe	S428F	Jewish	Ashkenazi	
+MLH1	Autosomal dominant	c.1411_1414delAAGA	p.Lys471AspfsX19	p.K471DfsX19	Jewish	Ashkenazi	
+MUTYH	Autosomal Recessive	c.1437_1439delGGA	p.Glu480del		Jewish	Yemenite	
+MLH1	Autosomal dominant	c.1771_1772delGA	p.Asp591Ter	p.D591*	Jewish	Afghani	
+BRCA2	Autosomal dominant	c.1813_1814insA	p.Ile605?fs	2041insA	Jewish	Ashkenazi	
+BRCA1	Autosomal dominant	c.181T>G	p.Cys61Gly	p.C61G	Jewish	non- Ashkenazi	
+MSH2	Autosomal dominant	c.1906G>C	p.Ala636Pro	A636P	Jewish	Ashkenazi	
+PMS2	Autosomal dominant	c.1970dupA	p.Asn657LysfsX6	p.N657KfsX6	Jewish	Iranian	
+PMS2	Autosomal dominant	c.2192T>G	p.Leu731Ter	p.L731X	Jewish	Iranian	
+BRCA1	Autosomal dominant	c.224_227delAAAG	p.Glu75Valfs		Jewish	Kurd/ Iraqi/Syrian	
+BRCA1	Autosomal dominant	c.2311_2317delTTGGTAC	p.Pro733fs		Jewish	Bukhara	
+BRCA2		c.2254_2257del	p.Asp752fs		Arab		
+BRCA2		c.2808_2811delACAA	p.Ala938fs		Jewish	Iraq/Greece	
+BRCA1	Autosomal dominant	c.2934T>G	p.Tyr978Ter	p.Y978*	Jewish	Afghani	
+MSH6	Autosomal dominant	c.3603_3606delCATG	c.3603_3606 delAGTG		Non-Jewish	Bedouin	
+BRCA1		c.3607C>T	p.Arg1203*		Jewish	Ashkenazi	
+BRCA2	Autosomal dominant	c.3751dup	p.Thr1251Asnfs		Jewish	Iraq/Ashkenazi	
+BRCA2	Autosomal dominant	c.3847_3848del	p.Val1283Lysfs		Jewish/ Non Jeiwsh -Caucasian	Ashkenazi	
+APC	Complex inheritance	c.3920T>A	p.Ile1307Lys	p.I1307K	Jewish	Ashkenazi	
+MSH6	Autosomal dominant	c.3959_3962delCAAG	p.Ala1320Glufs		Jewish	Ashkenazi	
+MSH6	Autosomal dominant	c.3984_3987dup	p.Leu330ValfsX12		Jewish	Ashkenazi	
+BRCA1	Autosomal dominant	c.4065_4068delTCAA	p.Asn1355_Gln1356?fs	4184del4	Jewish	AshkenaziMorroc	
+BRCA1	Autosomal dominant	c.4153delA 	p.Glu1346fs		Non-Jewish	Russians	
+BRCA2		c.4284dupT	p.Gln1429Serfs*9		Arab		
+BRCA2	Autosomal dominant	c.4829_4830delTG	p.Val1610Glyfs	 5057delTG	Jewish	Askenaz+Morrocn	
+BRCA2	Autosomal dominant	c.4936_4939delGAAA	p.Glu1646Glnfs	c.5164del4	Jewish	Ashkenazi/ non- Ashkenazi/North Afriaca/Balkan/Iraq	
+CHEK2		c.499G>A	p.Gly167Arg 		Various	Iraqi, Druze, Christian Arabs	
+BRCA1	Autosomal dominant	c.5074+3A>G			Non-Jewish	Muslims	
+BRCA1	Autosomal dominant	c.5123C>A	p.Ala1708Glu	p.A1708E	Jewish	Balkan	
+BRCA1	Autosomal dominant	c.5266dup	p.Gln1756Profs	 	Jewish	Ashkenazi	
+MUTYH	Autosomal Recessive	c.536A>G	p.Tyr179Cys	Y179C	Jewish	Moroccan	
+TP53	Autosomal dominant	c.541C>T	p.Arg181Cys		Non-Jewish	Muslims	
+BRCA1	Autosomal dominant	c.5434 C>G	p.Pro1812Ala		Jewish/ Non Jeiwsh -Caucasian	Sephardi	
+BRCA1		c.5444G>A	p.Trp1815*		Arab		
+BRCA2	Autosomal dominant	c.5946delT	p.Ser1982Argfs	 	Jewish	Ashkenazi	
+BRCA2		c.6685G>T	p.Glu2229*		Arab		
+BRCA2	Autosomal dominant	c.67+1G>A	IVS2 +1G>A		Jewish	Balkan	
+BRCA1	Autosomal dominant	c.68_69delAG	p.Glu23Valfs	 	Jewish	Ashkenazi	
+PMS2		c.686_687delCT       	 p.Ser229fs???		Arab		
+BRCA2	Autosomal dominant	c.7007G>C	p.Arg2336His	R2336P	Jewish	Balkan	
+MSH2	Autosomal dominant	c.705delA	p.Asp236Thrfs	p.D236Tfs	Non-Jewish	Druze	
+BRCA2		c.7579delG	p.Val2527*		Jewish	Ethiopian	
+BRCA2		c.771_775delTCAAA	p.Asn257fs		Arab		
+BRCA2	Autosomal dominant	c.8537_8538delAG	p.Glu2846Glyfs	 	Jewish	Yemenite	
+MSH2	Autosomal dominant	c.970_971delCA	p.Gln324ValfsX8	p.Q324VfsX8	Jewish	Georgian	
+BRCA1	Autosomal dominant	c.981_982delAT	p.Cys328Terfs	aka 1100delAT	Jewish	North African	
+BRCA2	Autosomal dominant	הכפלה אקסונים 14-18 			Jewish	Iranian	

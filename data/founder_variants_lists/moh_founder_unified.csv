@@ -1,0 +1,401 @@
+disease	omim	gene	variant	ethnicity	locality
+Hyperinsulinemic hypoglycemia, familial, 1 (PHHI/HHF1)	#256450	ABCC8	c.4160_4162delTCT	Ashkenaz	.
+Hyperinsulinemic hypoglycemia, familial, 1 (PHHI/HHF1)	#256450	ABCC8	c.3989-9G>A	Ashkenaz	.
+Metachromatic leukodystrophy - MLD	#250100	ARSA	c.1136C>T	Yemen	.
+Canavan disease	#271900	ASPA	c.693C>A	Ashkenaz	.
+Canavan disease	#271900	ASPA	c.854A>C	Ashkenaz	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1079C>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1521_1523delCTT	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1585-1G>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1624G>T	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1647T>G	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.2051_2052delAAinsG	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.254G>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.273+1G>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.2988+1173_3468+2111del	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.2989-1G>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3266G>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3276C>G	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3700A>G	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3717+12191C>T	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3846G>A	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3883_3886delATTT	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3909C>G	Israel (Jewish)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.54-5940_273+10250del	Israel (Jewish)	.
+Mental retardaition 34 	#614499	CRADD	c.52_59delGCAGAGGT	Bukhara	.
+Warsaw breakage syndrome	#313398	DDX11 	c.1763-1G>C	Ashkenaz	.
+Smith Lemli Opitz syndrome  (SLOS)	#270400	DHCR7	c.964-1G>C	Ashkenaz	.
+Mascular Dystrophy (Duchenne)-DMD	#310200	DMD	Del/Dup	Israel (Jewish)	.
+Familial dysautonomia (FD)	#223900	ELP1	c.2087G>C	Balkan	.
+Familial dysautonomia (FD)	#223900	ELP1	c.2204+6T>C	Balkan	.
+Familial dysautonomia (FD)	#223900	ELP1	c.2087G>C	Ashkenaz	.
+Familial dysautonomia (FD)	#223900	ELP1	c.2204+6T>C	Ashkenaz	.
+Walker Warburg Syndrome (WWS)	#253800	FKTN	c.1167dupA	Ashkenaz	.
+Fragile X syndrome ( FX)	#300624	FMR1	c.-129CGG[50]	Israel (Jewish)	.
+Thalassemia	#613985	HBB	MCV+MCH	North Africa	.
+Thalassemia	#613985	HBB	MCV+MCH	Kurd/Iran/Asian USSR	.
+Thalassemia	#613985	HBB	MCV+MCH	Iraq	.
+Tay Sachs (TS)	#272800	HEXA	c.1274_1277dup	Balkan	.
+Tay Sachs (TS)	#272800	HEXA	c.1421+1G>C	Balkan	.
+Tay Sachs (TS)	#272800	HEXA	c.509G>A	Balkan	.
+Tay Sachs (TS)	#272800	HEXA	c.571-2A>G	Balkan	.
+Tay Sachs (TS)	#272800	HEXA	c.805G>A	Balkan	.
+Tay Sachs (TS)	#272800	HEXA	c.910_912delTTC	Balkan	.
+Tay Sachs (TS)	#272800	HEXA	c.1274_1277dup	Ashkenaz	.
+Tay Sachs (TS)	#272800	HEXA	c.1421+1G>C	Ashkenaz	.
+Tay Sachs (TS)	#272800	HEXA	c.509G>A	Ashkenaz	.
+Tay Sachs (TS)	#272800	HEXA	c.571-2A>G	Ashkenaz	.
+Tay Sachs (TS)	#272800	HEXA	c.805G>A	Ashkenaz	.
+Tay Sachs (TS)	#272800	HEXA	c.910_912delTTC	Ashkenaz	.
+Tay Sachs (TS)	#272800	HEXA	c.1274_1277dup	North Africa	.
+Tay Sachs (TS)	#272800	HEXA	c.1421+1G>C	North Africa	.
+Tay Sachs (TS)	#272800	HEXA	c.509G>A	North Africa	.
+Tay Sachs (TS)	#272800	HEXA	c.571-2A>G	North Africa	.
+Tay Sachs (TS)	#272800	HEXA	c.805G>A	North Africa	.
+Tay Sachs (TS)	#272800	HEXA	c.910_912delTTC	North Africa	.
+Microcephaly, postnatal progressive, with seizures and brain atrophy ((ICCA)	#613668	MED17	c.1112T>C	Caucasus	.
+Homocystinuria due to MTHFR deficiency	#236250	MTHFR	c.474A>T	Bukhara	.
+ Chronic granulomatous disease due to deficiency of NCF-1	#233700	NCF1	c.579G>A	Caucasus	.
+Mitochondrial complex I deficiency - NDUFS6 gene	#618232	NDUFS6	c.344G>A	Caucasus	.
+Methylglutaconic aciduria, type III - Costeff	#258501	OPA3	c.143-1G>C	Iraq	.
+Peroxisome biogenesis disorder 5a	#614866	PEX2	c.550delT	Karaim (Egypt)	.
+Polycystic Kidney disease 4 PKD4	#263200	PKHD1	c.3761_3762delCCinsG	Ashkenaz	.
+Progressive Cerebello Cerebro Atrophy Pontocerebellar hypoplasia type 2D (PCCA)	#613811	SEPSECS	c.1001A>G	Morocco	.
+Progressive Cerebello Cerebro Atrophy Pontocerebellar hypoplasia type 2D (PCCA)	#613811	SEPSECS	c.715G>A	Morocco	.
+Progressive Cerebello Cerebro Atrophy Pontocerebellar hypoplasia type 2D (PCCA)	#613811	SEPSECS	c.1001A>G	Iraq	.
+Progressive Cerebello Cerebro Atrophy Pontocerebellar hypoplasia type 2D (PCCA)	#613811	SEPSECS	c.715G>A	Iraq	.
+Spinal muscular atrophy ( SMA)	#253300	SMN1	Exon7 del	Israel (Jewish)	.
+Netherton Syndrome NETH	#256500	SPINK5	c.691delC	Iraq	.
+Infantile neurodegenerative disorder - Early onset progressive encephalopathy (PEBAT)	#617193	TBCD	c.1423G>A	Kochin	.
+Meckel Gruber Sy Type8	#613885	TCTN2	c .1506-2A>G	Ethiopia	.
+Meckel Gruber Sy Type8	#613885	TCTN2	c .1506-2A>G	Yemen	.
+Spastic paraplegia 49, Autosomal Recessive	#615031	TECPR2	c.3416delT	Bukhara	.
+Usher syndrome, type 2A	#276901	USH2A	c.236_239dup	Iran	.
+Progressive Cerebello Cerebro Atrophy  Pontocerebellar hypoplasia type 2E (PCCA2)	#615851	VPS53	c.1556+5G>A	Morocco	.
+Progressive Cerebello Cerebro Atrophy  Pontocerebellar hypoplasia type 2E (PCCA2)	#615851	VPS53	c.2084A>G	Morocco	.
+Niemann-Pick disease type B, SMPD1-related	#607616	SMPD1	c.1493G>T	Ashkenaz	.
+Niemann-Pick disease type B, SMPD1-related	#607616	SMPD1	c.1828_1830delCGC	Ashkenaz	.
+Niemann-Pick disease type B, SMPD1-related	#607616	SMPD1	c.911T>C	Ashkenaz	.
+Niemann-Pick disease type B, SMPD1-related	#607616	SMPD1	c.996delC	Ashkenaz	.
+Fanconi anemia, complementation group C	#227645	FANCC	c.456+4A>T	Ashkenaz	.
+Joubert syndrome 2	#608091	TMEM216	c.218G>T	Ashkenaz	.
+Bloom syndrome	#210900	BLM	c.2207_2212delATCTGAinsTAGATTC	Ashkenaz	.
+Bloom syndrome	#210900	BLM	c.2407dupT	Ashkenaz	.
+Mucolipidosis type IV - ML4	#252650	MCOLN1	c.406-2A>G	Ashkenaz	.
+Mucolipidosis type IV - ML4	#252650	MCOLN1	c.-1015_789del	Ashkenaz	.
+Glycogen storage disease Ia - GDS1a	#232200	G6PC	c.247C>T	Ashkenaz	.
+Usher syndrome, type 1F	#602083	PCDH15	c.733C>T	Ashkenaz	.
+Usher syndrome, type 3A	#276902	CLRN1	c.144T>G	Ashkenaz	.
+Nemaline myopathy 2	#256030	NEB	c.7431+1917_7536+372del	Ashkenaz	.
+Maple syrup urine disease, type Ib	#248600	BCKDHB	c.548G>C	Ashkenaz	.
+Fanconi anemia, complementation group A	#227650	FANCA	c.2172_2173insG	North Africa	.
+Fanconi anemia, complementation group A	#227651	FANCA	c.4275delT	North Africa	.
+Ataxia-Telangiectasia; AT	#208900	ATM	c.103C>T	North Africa	.
+Megalencephalic leukoencephalopathy with subcortical cysts	#604004	MLC1	c.176G>A	Lybia	.
+Spinal muscular atrophy ( SMA)	#253300	SMN1	Exon7 del	Israel (Arab/Druze)	.
+Fragile X syndrome ( FX)	#300624	FMR1	c.-129CGG[50]	Israel (Arab/Druze)	.
+Thalassemia	#613985	HBB	MCV+MCH	Israel (Arab/Druze)	.
+Mascular Dystrophy (Duchenne)-DMD	#310200	DMD	Del/Dup	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1079C>A	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1521_1523delCTT	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1585-1G>A	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1624G>T	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.1647T>G	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.2051_2052delAAinsG	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.254G>A	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.273+1G>A	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.2988+1173_3468+2111del	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.2989-1G>A	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3266G>A	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3883_3886delATTT	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.3909C>G	Israel (Arab/Druze)	.
+Cystic fibrosis (CF)	#219700	CFTR	c.54-5940_273+10250del	Israel (Arab/Druze)	.
+Niemann-Pick disease type A,B	#257200	SMPD1	 c.573delT	North Israel (Arab/Druze)	Arab muslim
+Cockayne syndrome, type A	#216400	ERCC8	c.966C>A 	North Israel (Arab/Druze)	Arab christian
+APECED/APS1	#240300	AIRE	c.47C>T	North Israel (Arab/Druze)	Arab christian
+Pendred syndrome	#274600	SLC26A4	c.1198delT	North Israel (Arab/Druze)	Bedouin
+Microcephalic osteodysplastic (MOPDII) 	#210720	PCNT	c.3465-1G>A	North Israel (Arab/Druze)	Druze
+Carbamoyl phosphate synthetase I deficiency (CPS1d)	#237300	CPS1	c.4101+2T>C	North Israel (Arab/Druze)	Arab christian
+Carbamoyl phosphate synthetase I deficiency (CPS1d)	#237300	CPS1	c.3558+1G>C 	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.757G>A	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.1037-1G>A	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.896G>A 	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.149C>G	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.1204C>T	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.1217C>T	North Israel (Arab/Druze)	Arab christian
+Congenital nephrotic syndrome 	#256300	NPHS1	c.1138C>T	North Israel (Arab/Druze)	Abu Gosh (muslim)
+Congenital nephrotic syndrome 	#256300	NPHS1	c.2160dupC	North Israel (Arab/Druze)	Abu Gosh (muslim)
+Hyperoxaluria type 1 	#259900	AGXT	c.121G>A	North Israel (Arab/Druze)	.
+Microcephaly- hyperechogenic brain foci (MICROCEPHALY, SEIZURES, SPASTICITY, AND BRAIN CALCIFICATIONS; MISSBC)	#251280	PCDH12	c.2515C>T	North Israel (Arab/Druze)	.
+Fancini Anemia type U	#617247	XRCC2	c.643C>T	North Israel (Arab/Druze)	.
+Maple syrup urine disease 	#248600	BCKDHB	c.1016C>T	North Israel (Arab/Druze)	Abu Snan (Druze)
+Tay Sachs disease	#272800	HEXA	c.496delC 	North Israel (Arab/Druze)	.
+Tay Sachs disease	#272801	HEXA	c.835T>C	North Israel (Arab/Druze)	.
+CPT1A (Carnitine Palmitoyltransferase I)	#255120	CPT1A	c.1361A>G	North Israel (Arab/Druze)	.
+Fanconi Anemia	#227650	FANCA	c.3788_3790del	North Israel (Arab/Druze)	.
+Hypertophic Cardiomyopathy	#608758	GATC	c.233T>G	North Israel (Arab/Druze)	.
+Albinism (oculocutaneous type 1) 	#203100	TYR	c.1357C>T	North Israel (Arab/Druze)	.
+Meckel-Gruber Syndrome, Type 2- MKS2	#603194	TMEM216	c.230G>C	North Israel (Arab/Druze)	.
+Meckel Syndrome 3 ( MKS3)	#607361	TMEM67	c.1065+1delG 	North Israel (Arab/Druze)	.
+Non ketotic hyperglycinemia (NKH- glycine encephalopathy)	#605899	GLDC	c.2T>C	North Israel (Arab/Druze)	.
+Leber congenital amaurosis 2 (LCA2)	#204100	RPE65	c.227A>C	North Israel (Arab/Druze)	.
+Bartter and Gitelman syndrome	#607364	CLCNKB	c.1313G>A	North Israel (Arab/Druze)	.
+Molybdenum cofactor deficiency 	#603707	MOCS1	c.971G>A	North Israel (Arab/Druze)	.
+Pycnodysostosis	#265800	CTSK	c.990A>G	North Israel (Arab/Druze)	.
+HMG CoA lyase deficiency	#246450	HMGCL	c.122G>A	North Israel (Arab/Druze)	.
+Hyperoxaluria 1	#259900	AGXT	c.358+1G>A	North Israel (Arab/Druze)	.
+Lethal Congenital Arthrogryposis	#608807	TTN	c.36122delC	North Israel (Arab/Druze)	.
+Cockayne syndrome	#133540	ERCC6	c.1034_1035insT	North Israel (Arab/Druze)	.
+Prolidase Deficiency	#170100	PEPD	c.605C>T	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.584T>G	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.997A>T	North Israel (Arab/Druze)	.
+Hyperoxaluria III	#613616	HOGA1	c.944_946delAGG	North Israel (Arab/Druze)	.
+Leprechaunism- Donoho Syndrome	#246200	INSR	c.167T>C	North Israel (Arab/Druze)	.
+Familial  Hemophagocytic Lymphohistiocytosis 2-FHL2	#603553	PRF1	c.1122G>A	North Israel (Arab/Druze)	.
+CILD3- Primary Ciliary Dyskinesia	#608644	DNAH5	c.8011-2A>G	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.964C>T	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.1207C>T	North Israel (Arab/Druze)	.
+Myasthenic syndrome, congenital, 4C	#608931	CHRNE	c.1319_1326+15del	North Israel (Arab/Druze)	.
+Mucolipidosis III	#252605	GNPTG	c.499dupC	North Israel (Arab/Druze)	.
+Wolman disease	#278000	LIPA	c.398delC	North Israel (Arab/Druze)	.
+Krabbe  	#245200	GALC	c.1630G>A	North Israel (Arab/Druze)	.
+Stuve Wiedemann	#601559	LIFR	c.2472_2476delTATGT	North Israel (Arab/Druze)	.
+CDG type II ( MR AR15)	#614202	MAN1B1	c.1863G>A	North Israel (Arab/Druze)	.
+MEB	#614643	CRPPA	c.165dupG	North Israel (Arab/Druze)	.
+Retinitis pigmentosa 	#614500	C8orf37	c.545A>G	North Israel (Arab/Druze)	.
+hyperoxaluria I	#259900	AGXT	c.33_34insC	North Israel (Arab/Druze)	.
+ thyrosinemia III,	#276710	HPD	c.415-1G>A	North Israel (Arab/Druze)	.
+Multiminicore Disease	#255320	RYR1	c.9623C>T	North Israel (Arab/Druze)	.
+Kohlschutter-Tonz Syndrome	#226750	ROGDI	c.469C>T	North Israel (Arab/Druze)	.
+Hermansky-pudlak syndrome	#614171	BLOC1S6	c.318_320delinsAT	North Israel (Arab/Druze)	.
+Mental retardation non syndromic	#608443	CC2D1A	IVS13-16DEL	North Israel (Arab/Druze)	.
+spinal muscular dystrophy related disease	#604320	IGHMBP2	c.114delA	North Israel (Arab/Druze)	.
+Primary microcephaly hereditary (MCPH)	#614852	CEP152	c.2281-2A>G	North Israel (Arab/Druze)	.
+Basel-Vanagaite-Smirin-Yosef Syndrome	#616449	MED25	c.116A>G	North Israel (Arab/Druze)	.
+Deafness NS 	#610220	PJVK	c.406C>T	North Israel (Arab/Druze)	.
+Hyper IgE syndrome	#618282	ZNF341	c.904C>T	North Israel (Arab/Druze)	.
+Wilson disease, 	#277900	ATP7B	c.3649_3654del	North Israel (Arab/Druze)	.
+Hypertophic Cardiomyopathy	#617210	GATC	c.233T>G	North Israel (Arab/Druze)	.
+Congenital thyroid hormone and glucocorticoid deficiency (ACTH DEFICIENCY ISOLATED; IAD)	#201400	TBX19	c.574_577delATAG	North Israel (Arab/Druze)	.
+Cerebral dysgenesis, neuropathy, ichthyosis and keratodermia (CEDNIK)	#609528	SNAP29	c.223delG	North Israel (Arab/Druze)	.
+Epidermolysis bullosa 	#226700	LAMA3	c.2975delA	North Israel (Arab/Druze)	.
+Epidermolysis bullosa 	#226700	LAMB3	c.3247C>T	North Israel (Arab/Druze)	.
+Wolman disease	#278000	LIPA	c.398delC	North Israel (Arab/Druze)	.
+Severe combined immune deficiency SCID	#601457	RAG2	c.379A>T	North Israel (Arab/Druze)	.
+Spinal muscular dystrophy related disease	#604320	IGHMBP2	c.707T>G	North Israel (Arab/Druze)	.
+Progressive Familial Intrahepatic Cholestasis (PFIC) type II	#605479	ABCB11	c.3268C>T 	North Israel (Arab/Druze)	.
+Hyperphosphatasia mental retardation syndrome 4	#615716	PGAP3	c.845A>G	North Israel (Arab/Druze)	.
+Congenital Tufting Enteropathy (DIAR5)	#613217	EPCAM	deletion	North Israel (Arab/Druze)	.
+Krabbe disease 	#245200	GALC	c.1796T>G	North Israel (Arab/Druze)	.
+Combined oxidative phosphorylation deficiency 24	#616239	NARS2	c.500A>G	North Israel (Arab/Druze)	.
+Ataxia telangiectasia, 	#208900	ATM	c.1339C>T	North Israel (Arab/Druze)	.
+Combined oxidative phosphorylation deficiency 24 	#616239	NARS2	c.500A>G	North Israel (Arab/Druze)	.
+Pompe (glycogen storage disease II (GSD2)	#232300	GAA	c.1210G>A	North Israel (Arab/Druze)	.
+Congenital insensivity to pain with anhidrosis 	#256800	NTRK1	c.2084C>T	North Israel (Arab/Druze)	.
+Limb girdle muscular dystrophy (Muscular Dystrophy dystroglycanopathy)	#606612	FKRP	c.160C>T	North Israel (Arab/Druze)	.
+Ataxia telangiectasia	#208900	ATM	c.497del17514bp	North Israel (Arab/Druze)	.
+Argininosuccinic aciduria	#207900	ASL	c.346C>T	North Israel (Arab/Druze)	.
+Carbamoyl phosphate synthetase I deficiency	#237300	CPS1	c.3265C>T	North Israel (Arab/Druze)	.
+Cerebrotendinous xanthomatosis	#213700	CYP27A1	c.355delC	North Israel (Arab/Druze)	.
+Prolidase deficiency	#170100	PEPD	c.605C>T	North Israel (Arab/Druze)	.
+Fanconi Anemia	#227650	FANCA	c.3785_3787del3	North Israel (Arab/Druze)	.
+Cockayne syndrome	#133540	ERCC6	c.1034_1035insT	North Israel (Arab/Druze)	.
+Fanconi A	#227650	FANCA	c.3785_3787del3	North Israel (Arab/Druze)	.
+Hyperoxaluria I 	#259900	AGXT	c.584T>G	North Israel (Arab/Druze)	.
+Kohlschutter-Tonz	#226750	ROGDI	c.469C>T	North Israel (Arab/Druze)	.
+Kindler syndrome	#173650	FERMT1	c.-1501_-19+470del	North Israel (Arab/Druze)	.
+Pelizaeus-Merzbacher like disease	#612233	HSPD1	c.86A>G	North Israel (Arab/Druze)	.
+Ventricular tachycardia	#611938	CASQ2	c.919G>C	North Israel (Arab/Druze)	.
+Hypoparathyroidism retardation dysmorphism (HRD)	#241410	TBCE	c.154_165delAGCCACGAAGGG	North Israel (Arab/Druze)	.
+Finnish-type congenital nephrosis 1	#256300	NPHS1	c.2104G>A	North Israel (Arab/Druze)	.
+Distal arthrogryposis type 5	#615065	ECEL1	c.110_155del	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.584T>G	North Israel (Arab/Druze)	.
+Cockayne syndrome	#133540	ERCC6	c.1034_1035insT	North Israel (Arab/Druze)	.
+Kohlschütter-Tönz	#226750	ROGDI	c.469C>T	North Israel (Arab/Druze)	.
+Leprechaunism	#246200	INSR	c.167T>C	North Israel (Arab/Druze)	.
+Hypertophic Cardiomyopathy	#618839	GATC	c.233T>G	North Israel (Arab/Druze)	.
+Smith Lemli Opitz	#270400	DHCR7	c.755A>G	North Israel (Arab/Druze)	.
+Hypophosphatasia  	#241510	ALPL	c.1348C>T	North Israel (Arab/Druze)	.
+Meckel-Gruber Syndrome type4	#611134	CEP290	c.1225delA	North Israel (Arab/Druze)	.
+D-bifunctional protein deficiency	#261515	HSD17B4	c.944-1G>A	North Israel (Arab/Druze)	.
+APECED(APS1)- Autoimmune polyendocrine syndrome Type 1	#240300	AIRE	c.47C>T	North Israel (Arab/Druze)	.
+Infantile bilateral striatal necrosis (Strionigral degeneration) 	#271930	NUP62	c.1172A>C	North Israel (Arab/Druze)	.
+BFPP-Bilateral frontoparietal polymicrogyria	#606854	ADGRG1	c.1167+3G>C	North Israel (Arab/Druze)	.
+Methyl Glutaric Aciduria 	#618329	MICOS13	c.44delG	North Israel (Arab/Druze)	.
+CODAS syndrome	#600373	LONP1	c.2009C>T	North Israel (Arab/Druze)	.
+Maple syrup urine disease	#201475	DBT	c.581C>G	North Israel (Arab/Druze)	.
+Pompe	#232300	GAA	c.1210G>A	North Israel (Arab/Druze)	.
+Pompe	#232300	GAA	c.1064T>C	North Israel (Arab/Druze)	.
+Hurler	#607014	IDUA	c.1096A>C 	North Israel (Arab/Druze)	.
+Mitochondrial DNA depletion syndrome 2 ( MTDPS2)	#609560	TK2	c.635T>A	North Israel (Arab/Druze)	.
+Ataxia telangiectasia (AT)	#208900	ATM	c.2284_2285delCT	North Israel (Arab/Druze)	.
+Sandhoff	#268800	HEXB	c.1082+5G>A	North Israel (Arab/Druze)	.
+Spastic paraplegia with mental impairment (SPG11)	#604360	SPG11	c.4339C>T	North Israel (Arab/Druze)	.
+Primary Ciliary Dyskinesia (PCD)Type7	#611884	DNAH11	c.7267-1G>T	North Israel (Arab/Druze)	.
+Cardio-cutaneous syndrome		PPP1R13L	c.2241C>G	North Israel (Arab/Druze)	.
+Factor  7 deficiency	#227500	F7	c.1256C>T	North Israel (Arab/Druze)	.
+Cockayne syndrome	#133540	ERCC6	c.1034_1035insT	North Israel (Arab/Druze)	.
+Prolidase Deficiency	#170100	PEPD	c.605C>T	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.584T>G	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.997A>T	North Israel (Arab/Druze)	.
+Hyperoxaluria III	#613616	HOGA1	c.944_946delAGG	North Israel (Arab/Druze)	.
+Leprechaunism- Donoho Syndrome	#246200	INSR	c.167T>C	North Israel (Arab/Druze)	.
+Familial  Hemophagocytic Lymphohistiocytosis 2-FHL2	#603553	PRF1	c.1122G>A	North Israel (Arab/Druze)	.
+CILD3- Primary Ciliary Dyskinesia	#608644	DNAH5	c.8011-2A>G	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.1207C>T	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.964C>T	North Israel (Arab/Druze)	.
+Myasthenic syndrome, congenital, 4C	#608931	CHRNE	c.1319_1326+15del	North Israel (Arab/Druze)	.
+Cockayne syndrome	#133540	ERCC6	c.1034_1035insT	North Israel (Arab/Druze)	.
+Prolidase Deficiency	#170100	PEPD	c.605C>T	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.584T>G	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.997A>T	North Israel (Arab/Druze)	.
+Hyperoxaluria III	#613616	HOGA1	c.944_946delAGG	North Israel (Arab/Druze)	.
+Leprechaunism- Donoho Syndrome	#246200	INSR	c.167T>C	North Israel (Arab/Druze)	.
+Familial  Hemophagocytic Lymphohistiocytosis 2-FHL2	#603553	PRF1	c.1122G>A	North Israel (Arab/Druze)	.
+CILD3- Primary Ciliary Dyskinesia	#608644	DNAH5	c.8011-2A>G	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.964C>T	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.1207C>T	North Israel (Arab/Druze)	.
+Myasthenic syndrome, congenital, 4C	#608931	CHRNE	c.1319_1326+15del	North Israel (Arab/Druze)	.
+Cerebral dysgenesis, neuropathy, ichthyosis and keratodermia (CEDNIK)	#609528	SNAP29	c.223delG	North Israel (Arab/Druze)	.
+Biotinidase deficiency	#253260	BTD	c.100G>A	North Israel (Arab/Druze)	.
+Leber amaurosis	#613835	CRB1	c.4121_4130delCAACTCAGGG	North Israel (Arab/Druze)	.
+Mitochondrial DNA depletion syndrome- MTDPS2	#609560	TK2	c.542T>A	North Israel (Arab/Druze)	.
+Complex hereditary spastic paraparesis	#614898	VPS37A	c.1146A>T	North Israel (Arab/Druze)	.
+Autosomal recessive progressive Leukoencephalopathy	#617527	PLAA	c.2254C>T	North Israel (Arab/Druze)	.
+Mitochondrial DNA depletion syndrome	#251880	DGUOK	c.255delA	North Israel (Arab/Druze)	.
+Wilson disease	#277900	ATP7B	c.1544G>A	North Israel (Arab/Druze)	.
+Ataxia telangiectasia	#208900	ATM	c.6672_6680delGGCTCTACGinsCTC	North Israel (Arab/Druze)	.
+POC1A deficiency-SHORT STATURE, ONYCHODYSPLASIA, FACIAL DYSMORPHISM, AND HYPOTRICHOSIS; SOFT	#614813	POC1A	c.512T>C	North Israel (Arab/Druze)	.
+Primary hyperoxaluria type I	#259900	AGXT	c.33dupC	North Israel (Arab/Druze)	.
+Pelizaeus-Merzbacher like disease	#612233	HSPD1	c.86A>G	North Israel (Arab/Druze)	.
+Ventricular tachycardia	#611938	CASQ2	c.919G>C	North Israel (Arab/Druze)	.
+Hypoparathyroidism retardation dysmorphism (HRD)	#241410	TBCE	c.154_165delAGCCACGAAGGG	North Israel (Arab/Druze)	.
+Microcephaly- hyperechogenic brain foci (MICROCEPHALY, SEIZURES, SPASTICITY, AND BRAIN CALCIFICATIONS; MISSBC)	#251280	PCDH12	c.995delT	North Israel (Arab/Druze)	.
+Infantile neuroaxonal dystrophy (INAD)	#256600	PLA2G6	c.2251G>A	North Israel (Arab/Druze)	.
+Mannosidosis,alpha (types I & II)-MANSA	#248500	MAN2B1	c.454A>T	North Israel (Arab/Druze)	.
+Ataxia telangiectasia 	#208900	ATM	c.497del17514bp	North Israel (Arab/Druze)	.
+Non ketotic hyperglycinemia (NKH)	#605899	AMT	c.125A>G	North Israel (Arab/Druze)	.
+ARTHROPATHY, PROGRESSIVE PSEUDORHEUMATOID, OF CHILDHOOD; PPAC	#208230	CCN6	c.536_537delGT	North Israel (Arab/Druze)	.
+Myasthenic syndrome, congenital, 5	#603034	COLQ	c.1228C>T	North Israel (Arab/Druze)	.
+Retinitis pigmentosa	#613582	PDE6G	c.187+1G>T	North Israel (Arab/Druze)	.
+Glutaric aciduria type  II	#231680	ETFDH	c.1084G>A	North Israel (Arab/Druze)	.
+Retinitis pigmentosa	#610599	PRCD	c.64C>T	North Israel (Arab/Druze)	.
+Deafness NS	#220290	GJB2	c.229T>C	North Israel (Arab/Druze)	.
+Deafness NS	#220291	GJB3	c.109G>A	North Israel (Arab/Druze)	.
+Deafness NS	#220292	GJB4	c.35delG	North Israel (Arab/Druze)	.
+Cockayne syndrome	#133540	ERCC6	c.1034_1035insT	North Israel (Arab/Druze)	.
+Prolidase Deficiency	#170100	PEPD	c.605C>T	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.584T>G	North Israel (Arab/Druze)	.
+Hyperoxaluria I	#259900	AGXT	c.997A>T	North Israel (Arab/Druze)	.
+Hyperoxaluria III	#613616	HOGA1	c.944_946delAGG	North Israel (Arab/Druze)	.
+Leprechaunism- Donoho Syndrome	#246200	INSR	c.167T>C	North Israel (Arab/Druze)	.
+Familial  Hemophagocytic Lymphohistiocytosis 2-FHL2	#603553	PRF1	c.1122G>A	North Israel (Arab/Druze)	.
+CILD3- Primary Ciliary Dyskinesia	#608644	DNAH5	c.8011-2A>G	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.964C>T	North Israel (Arab/Druze)	.
+Mucolipidosis Type IV	#252650	MCOLN1	c.1207C>T	North Israel (Arab/Druze)	.
+Myasthenic syndrome, congenital, 4C	#608931	CHRNE	c.1319_1326+15del	North Israel (Arab/Druze)	.
+Cardiomyopathy	#610768	DOLK	c.912G>T	North Israel (Arab/Druze)	.
+Metachromatic Leukodystrophy	#250100	ARSA	c.292_293delTCinsCT	North Israel (Arab/Druze)	.
+Gray platelet syndrome	#139090	NBEAL2	c. 2701C>T	North Israel (Arab/Druze)	.
+D-bifunctional protein deficiency	#261515	HSD17B4	c.944-1G>A	North Israel (Arab/Druze)	.
+Tay Sachs disease  	#272800	HEXA	c.496delC 	North Israel (Arab/Druze)	.
+Tay Sachs disease  	#272800	HEXA	c.835T>C	North Israel (Arab/Druze)	.
+Maple syrup disease ( MSUD)	#248600	BCKDHB	c.1016C>T	North Israel (Arab/Druze)	.
+Leprechaunism (Donohue SYNDROME)	#246200	INSR	c.167T>C	North Israel (Arab/Druze)	.
+Molybdenum cofactor deficiency B	#252160	MOCS2	c.226G>A	North Israel (Arab/Druze)	.
+Cockayne/XP	#278780	ERCC5	c.205C>T	North Israel (Arab/Druze)	.
+Krabbe	#245200	GALC	c.1630G>A	North Israel (Arab/Druze)	.
+HUPRA	#613845	SARS2	c.1169A>G	North Israel (Arab/Druze)	.
+Cockayne Syndrome (CSA)	#216400	ERCC8	c.843+1G>C	North Israel (Arab/Druze)	.
+Pelizaeus-Merzbacher like disease	#612233	HSPD1	c.86A>G	North Israel (Arab/Druze)	.
+Ventricular tachycardia	#611938	CASQ2	c.919G>C	North Israel (Arab/Druze)	.
+Hypoparathyroidism retardation dysmorphism (HRD)	#241410	TBCE	c.154_165delAGCCACGAAGGG	North Israel (Arab/Druze)	.
+Finnish-type congenital nephrosis 1	#256300	NPHS1	c.2104G>A	North Israel (Arab/Druze)	.
+Ataxia telangiectasia 	#208900	ATM	c.497del17514bp	North Israel (Arab/Druze)	.
+Myasthenic syndrome, congenital, 5	#603034	COLQ	c.788dup	North Israel (Arab/Druze)	.
+Severe combined immune deficiency (SCID)	#601457	RAG1	c.1361T>A	North Israel (Arab/Druze)	.
+Limb girdle muscular dystrophy (LGMD2C)	#604286	SGCG	c.525delT	North Israel (Arab/Druze)	.
+Spastic paraplegia 81 EPT1 deficiency	#618768	SELENOI	c.732-2A>G	North Israel (Arab/Druze)	.
+Rickets 1,25 dehydroxy vitamin D3 resistant  (VDRR)	#277440	VDR	c.885C>A	North Israel (Arab/Druze)	.
+Spinal muscular atrophy ( SMA)	#253300	SMN1	Exon7 del	South Israel (Muslim/Druze)	.
+Fragile X syndrome ( FX)	#300624	FMR1	c.-129CGG[50]	South Israel (Muslim/Druze)	.
+Hypoparathyroidism retardation dysmorphism ( HRD)	#241410	TBCE	c.155_166delGCCACGAAGGGA	South Israel (Muslim/Druze)	.
+Congenital Insensitivity to pain with anhidrosis (CIPA)	#256800	NTRK1	c.1842_1843insT	South Israel (Muslim/Druze)	.
+Mascular Dystrophy (Duchenne)-DMD	#310200	DMD	Del/Dup	South Israel (Muslim/Druze)	.
+2p21 DELETION SYNDROME,  (HYPOTONIA-CYSTINURIA SYNDROME)	#606407	Deletion includes PREPL and SLC3A1	2p21del   [NC_000002.11:41727140_47727139del]	South Israel (Muslim/Druze)	.
+ACYL-CoA DEHYDROGENASE, VERY LONG-CHAIN, DEFICIENCY OF; ACADVLD	#201475	ACADVL	c.65C>A	South Israel (Muslim/Druze)	.
+ADAMS-OLIVER SYNDROME 4; AOS4	#615297	EOGT	c.1074delA	South Israel (Muslim/Druze)	.
+ATAXIA-TELANGIECTASIA; AT	#208900	ATM	c.7241_7244delAAGC	South Israel (Muslim/Druze)	.
+ATAXIA-TELANGIECTASIA-LIKE DISORDER 1; ATLD1 	#604391	MRE11	c.290A>G	South Israel (Muslim/Druze)	.
+BARDET BIEDL SYNDROME 3, BBS3	#600151	ARL6	c.364C>T	South Israel (Muslim/Druze)	.
+BARDET-BIEDL SYNDROME 2; BBS2	#615981	BBS2	c.224T>G	South Israel (Muslim/Druze)	.
+BARDET-BIEDL SYNDROME 4; BBS4 	#615982	BBS4	c.884G>C 	South Israel (Muslim/Druze)	.
+BARDET-BIEDL SYNDROME 4; BBS4 	#615982	BBS4	Del exons 3 and 4	South Israel (Muslim/Druze)	.
+BARE LYMPHOCYTE SYNDROME, TYPE II/SEVERE COMBINED IMMUNODEFICIENCY, HLA CLASS II-NEGATIVE ( SCID, HLA CLASS II-NEGATIVE)	#209920	RFX5	c.715C>T	South Israel (Muslim/Druze)	.
+BARTTER SYNDROME, TYPE 4A	#602522	BSND	c.28G>A	South Israel (Muslim/Druze)	.
+BIRK-FLUSSER SYNDROME (CORPUS CALLOSUM, AGENESIS OF, WITH FACIAL ANOMALIES AND CEREBELLAR ATAXIA; CCAFCA)	#616819	FRMD4A	c.2134_2146dupCTGGAGTCCCAGG	South Israel (Muslim/Druze)	.
+BIRK-LANDAU-PEREZ SYNDROME; BILAPES ( Cerebro-Renal Syndrome)	#617595	SLC30A9	c.1049_1051delCAG	South Israel (Muslim/Druze)	.
+CARBAMOYL PHOSPHATE SYNTHETASE I DEFICIENCY, HYPERAMMONEMIA DUE TO	#237300	CPS1	c.3392C>T	South Israel (Muslim/Druze)	.
+CARDIOMYOPATHY, DILATED, 1GG; CMD1GG	#613642	SDHA	c.1664G>A	South Israel (Muslim/Druze)	.
+CARMI SYNDROME (EPIDERMOLYSIS BULLOSA JUNCTIONALIS WITH PYLORIC ATRESIA)	#226730	ITGB4	c.3279_3793+180del	South Israel (Muslim/Druze)	.
+CARNITINE-ACYLCARNITINE TRANSLOCASE DEFICIENCY; CACTD (CACT DEFICIENCY)	#212138	SLC25A20 	c.713A>G	South Israel (Muslim/Druze)	.
+CONE-ROD DYSTROPHY 3; CORD3/RETINITIS PIGMENTOSA 19; RP19/STARGARDT DISEASE 1; STGD1	#248200	ABCA4	c.834delT	South Israel (Muslim/Druze)	.
+CONGENITAL DISORDER OF GLYCOSYLATION, TYPE IId; CDG2D	#607091	B4GALT1 	c.61C>T	South Israel (Muslim/Druze)	.
+CONGENITAL DISORDER OF GLYCOSYLATION, TYPE 1T ; CDG1T	#614921	PGM1	c.112A>T	South Israel (Muslim/Druze)	.
+CYSTIC FIBROSIS 	#219700	CFTR	c.1624G>T	South Israel (Muslim/Druze)	.
+CYSTIC FIBROSIS 	#219700	CFTR	c.892delA	South Israel (Muslim/Druze)	.
+DESMOSTEROLOSIS 	#602398	DHCR24 	c.307C>T	South Israel (Muslim/Druze)	.
+DIABETES INSIPIDUS, NEPHROGENIC, AUTOSOMAL (DIABETES INSIPIDUS, NEPHROGENIC, TYPE II)	#125800	AQP2	c.83T>C	South Israel (Muslim/Druze)	.
+DIHYDROLIPOAMIDE DEHYDROGENASE DEFICIENCY; DLDD	#246900	DLD	c.1436A>T 	South Israel (Muslim/Druze)	.
+DISORDERED STEROIDOGENESIS DUE TO CYTOCHROME P450 OXIDOREDUCTASE DEFICIENCY 	#613571	POR	c.1615G>A	South Israel (Muslim/Druze)	.
+EPIDERMOLYSIS BULLOSA SIMPLEX, AUTOSOMAL RECESSIVE 1; EBSB1	#601001	KRT14	c.915G>A	South Israel (Muslim/Druze)	.
+GLUTARIC ACIDEMIA I; GA1	#231670	GCDH	c.505+1G>A	South Israel (Muslim/Druze)	.
+GLYCINE ENCEPHALOPATHY; GCE (HYPERGLYCINEMIA, NONKETOTIC; NKH )	#605899	GLDC	c.2607C>A	South Israel (Muslim/Druze)	.
+GLYCOGEN STORAGE DISEASE Ib; GSD1B 	#232220	SLC37A4	c.83G>A	South Israel (Muslim/Druze)	.
+GLYCOGEN STORAGE DISEASE Ib; GSD1B 	#232220	SLC37A4	c.1042_1043delCT	South Israel (Muslim/Druze)	.
+HEMOLYTIC UREMIC SYNDROME ATYPICAL/COMPLEMENT FACTOR H DEFICIENCY;CFHD	#609814	CFH	c.3673_3696del	South Israel (Muslim/Druze)	.
+HYPER-IgE RECURRENT INFECTION SYNDROME 2, AUTOSOMAL RECESSIVE; HIES2	#243700	DOCK8	c.5132C>A	South Israel (Muslim/Druze)	.
+HYPERINSULINEMIC HYPOGLYCEMIA, FAMILIAL, 1; HHF1 (PERSISTENT HYPERINSULINEMIC HYPOGLYCEMIA OF INFANCY; PHHI)	#256450	ABCC8	c.2506C>T	South Israel (Muslim/Druze)	.
+HYPOMAGNESEMIA 1 (HOMG1)	#602014	TRPM6	c.2009+1G>A	South Israel (Muslim/Druze)	.
+HYPOPARATHYROIDISM-RETARDATION-DYSMORPHISM SYNDROME; HRDS (HRD)	#241410	TBCE	c.208_209delAT	South Israel (Muslim/Druze)	.
+HYPOPHOSPHATASIS Infantile HPPI	#241500	ALPL	c.1171C>T	South Israel (Muslim/Druze)	.
+HYPOTONIA, INFANTILE, WITH PSYCHOMOTOR RETARDATION AND CHARACTERISTIC FACIES 2; IHPRF2	#616801	UNC80	c.151C>T	South Israel (Muslim/Druze)	.
+HYPOTONIA, INFANTILE, WITH PSYCHOMOTOR RETARDATION; IHPMR 	#616816	CCDC174	c.1404A>G	South Israel (Muslim/Druze)	.
+INDIFFERENCE TO PAIN, CONGENITAL, AUTOSOMAL RECESSIVE; CIP	#243000	SCN9A	c.2687G>A	South Israel (Muslim/Druze)	.
+INFANTILE BILATERAL STRIATAL NECROSIS; IBSN (STRIATONIGRAL DEGENERATION, INFANTILE; SNDI)	#271930	NUP62	c.1172A>C	South Israel (Muslim/Druze)	.
+INFANTILE SIALIC ACID STORAGE DISEASE; ISSD	#269920	SLC17A5	c.983G>A	South Israel (Muslim/Druze)	.
+INFLAMMATORY BOWEL DISEASE 28, AUTOSOMAL RECESSIVE; IBD28	#613148	IL10RA	c.537G>A	South Israel (Muslim/Druze)	.
+INTELLECTUAL DEVELOPMENTAL DISORDER AND RETINITIS PIGMENTOSA; IDDRP 	#618195	SCAPER	c.2806delC	South Israel (Muslim/Druze)	.
+ISOLATED GROWTH HORMONE DEFICIENCY, TYPE IB 	#262400	GH1	c.456+5G>C	South Israel (Muslim/Druze)	.
+LEBER CONGENITAL AMAUROSIS 1; LCA1 	#204000	GUCY2D	c.2129C>T	South Israel (Muslim/Druze)	.
+LETHAL CONGENITAL CONTRACTURAL SYNDROME 2; LCCS2	#607598	ERBB3	c.1184-9A>G	South Israel (Muslim/Druze)	.
+LETHAL CONGENITAL CONTRACTURE SYNDROME 3; LCCS3	#611369	PIP5K1C	c.757G>A	South Israel (Muslim/Druze)	.
+LETHAL CONGENITAL CONTRACTURE SYNDROME 4; LCCS4 (Arthrogryposis)	#614915	MYBPC1	c.952C>T	South Israel (Muslim/Druze)	.
+LEUKODYSTROPHY, HYPOMYELINATING, 3; HLD3	#260600	AIMP1	c.292_293del	South Israel (Muslim/Druze)	.
+MAPLE SYRUP URINE DISEASE; MSUD	#248600	BCKDHA	c.859C>T	South Israel (Muslim/Druze)	.
+MITOCHONDRIAL COMPLEX I DEFICIENCY, NUCLEAR TYPE 1(Hypertrophic cardiomyopathy)	#618236	NDUFA11	c.97+5G>A	South Israel (Muslim/Druze)	.
+MITOCHONDRIAL COMPLEX III DEFICIENCY, NUCLEAR TYPE 4; MC3DN4	#615159	UQCRQ	c.134C>T	South Israel (Muslim/Druze)	.
+MULTIPLE SULFATASE DEFICIENCY; MSD	#272200	SUMF1	c.1043C>T	South Israel (Muslim/Druze)	.
+MUSCULAR DYSTROPHY, CONGENITAL MEROSIN-DEFICIENT, 1A; MDC1A	#607855	LAMA2	c.8665G>A	South Israel (Muslim/Druze)	.
+MUSCULAR DYSTROPHY, CONGENITAL MEROSIN-DEFICIENT, 1A; MDC1A	#607855	LAMA2	c.8689C>T	South Israel (Muslim/Druze)	.
+MYOPATHY CONGENITAL PROGRESSIVE with SCOLIOSIS MYOSCO	#618578	PAX7	c.1403-2A>G	South Israel (Muslim/Druze)	.
+MYOTONIA CONGENITA, AUTOSOMAL RECESSIVE	#255700	CLCN1	c.1444G>C	South Israel (Muslim/Druze)	.
+MYOTONIA CONGENITA, AUTOSOMAL RECESSIVE	#255700	CLCN1	c.1586C>T	South Israel (Muslim/Druze)	.
+NEPHRONOPHTHISIS 2; NPHP2 	#602088	INVS	c.2719C>T	South Israel (Muslim/Druze)	.
+NEURODEGENERATION WITH BRAIN IRON ACCUMULATION 2A; NBIA2A (NEUROAXONAL DYSTROPHY, INFANTILE; INAD)	#256600	PLA2G6	c.2070_2072delTGT	South Israel (Muslim/Druze)	.
+NIEMANN-PICK DISEASE, TYPE C1; NPC1 	#257220	NPC1	c.1211G>A	South Israel (Muslim/Druze)	.
+OSTEOGENESIS IMPERFECTA, TYPE XIV; OI14 	#615066	TMEM38B	c.454+279_543-5092delinsAATTAAGGTATA	South Israel (Muslim/Druze)	.
+OSTEOPETROSIS, AUTOSOMAL RECESSIVE 1; OPTB1 	#259700	TCIRG1	c.674delG	South Israel (Muslim/Druze)	.
+OTOSPONDYLOMEGAEPIPHYSEAL DYSPLASIA, AUTOSOMAL RECESSIVE; OSMEDB/ WEISSENBACHER-ZWEYMULLER SYNDROME; WZS	#215150	COL11A2 	c.3991C>T	South Israel (Muslim/Druze)	.
+PEROXISOME BIOGENESIS DISORDER 1A (ZELLWEGER); PBD1A	#214100	PEX6	c.1947delG	South Israel (Muslim/Druze)	.
+POLYCYSTIC KIDNEY DISEASE 4 WITH OR WITHOUT POLYCYSTIC LIVER DISEASE; PKD4 (ARPKD)	#263200	PKHD1	c.2279G>A	South Israel (Muslim/Druze)	.
+POLYCYSTIC KIDNEY DISEASE 4 WITH OR WITHOUT POLYCYSTIC LIVER DISEASE; PKD4 (ARPKD)	#263200	PKHD1	c.6122-12G>A	South Israel (Muslim/Druze)	.
+RENAL TUBULAR ACIDOSIS (RTA), PROXIMAL, WITH OCULAR ABNORMALITIES AND MENTAL RETARDATION	#604278	SLC4A4	c.2321G>A	South Israel (Muslim/Druze)	.
+TAY-SACHS DISEASE; TSD 	#272800	HEXA	c.459+2dupT	South Israel (Muslim/Druze)	.
+DEAFNESS, AUTOSOMAL RECESSIVE 11; DFNB11	#600974	TMC1	c.100C>T	South Israel (Muslim/Druze)	.
+Glycogen storage disease II GSDII	#232300	GAA	c.340_341insT	South Israel (Muslim/Druze)	.
+Anemia, congenital dyserythropoietic Type Ia	#224120	CDAN1	c.3124C>T	South Israel (Muslim/Druze)	.
+Leber congenital amaurosis 10 	#611755	CEP290	c.1666delA	South Israel (Muslim/Druze)	.
+MPS3A (sanfilippo syndrome A)	#252900	SGSH	c.1298G>A	South Israel (Muslim/Druze)	.
+Glaucoma primary congenital  GLC3A	#231300	CYP1B1	c.182G>A	South Israel (Muslim/Druze)	.
+Retinitis pigmentosa 25	#602772	EYS	c.-36842_1300-12661del	South Israel (Muslim/Druze)	.
