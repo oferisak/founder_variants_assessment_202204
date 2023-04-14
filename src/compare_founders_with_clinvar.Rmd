@@ -1,0 +1,46 @@
+---
+title: "compare founders with clinvar"
+author: "Ofer Isakov"
+date: '2023-03-16'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/')
+library(ProjectTemplate)
+load.project()
+```
+
+```{r load_data}
+founder_variants<-read_delim('./output/moh_variants_202202_manual_revision.csv')
+
+clinvar_variants<-vcfR::read.vcfR('./data/accessory_data/clinvar_hg38_20230311.vcf.gz')
+
+clinvar_fix<-data.frame(clinvar_variants@fix)
+chr2accession<-readr::read_delim('./data/accessory_data/chr_accession.csv')
+```
+
+```{r compare_files}
+# convert founder file to bed file
+comp_vars<-
+  founder_variants%>%select(disease,omim,gene,variant,ethnicity,g_GRCH38)%>%
+  separate(col=g_GRCH38,sep=':',into=c('chr','gcoord'),remove = F)%>%
+  left_join(chr2accession,by=c('chr'='name'))%>%
+  mutate(chr=`#chrom`,
+         POS=stringr::str_extract(gcoord,'\\d+'),
+         CHROM=stringr::str_replace(chr,'chr',''))%>%
+  select(-c(`#chrom`,chr))%>%
+  filter(!duplicated(gcoord))
+
+comp_vars<-comp_vars%>%left_join(clinvar_fix)
+comp_vars<-comp_vars%>%mutate(cln_sig=stringr::str_extract(INFO,'CLNSIG=[^;]+'),
+                              cln_hgvs=stringr::str_extract(INFO,'CLNHGVS=[^;]+'),
+                              cln_hgvs=stringr::str_replace(cln_hgvs,'CLNHGVS=',''),
+                              same_hgvs=ifelse(g_GRCH38==cln_hgvs,1,0),
+                              same_hgvs=ifelse(is.na(same_hgvs),-1,same_hgvs))
+# remove those that were found but matched to additional same-pos variants in clinvar
+comp_vars<-comp_vars%>%group_by(g_GRCH38)%>%slice_max(n=1,order_by=same_hgvs)
+  
+write.table(comp_vars,file='./output/moh_202202_vs_clinvar_202303.csv',sep='\t',row.names = F)
+```
