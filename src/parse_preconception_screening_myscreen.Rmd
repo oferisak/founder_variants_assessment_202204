@@ -1,0 +1,89 @@
+---
+title: "preconception_screening_MyScreen"
+author: "Ofer Isakov"
+date: '2023-03-07'
+output: html_document
+---
+
+A script that takes in the preconception screening founder variants from the MyScreen list (davidov_et_al_clinical_genetics_s8.csv)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/')
+library(ProjectTemplate)
+load.project()
+```
+
+```{r myscreen_fix}
+#myscreen_variants<-readr::read_delim(file = './data/founder_variants_lists/davidov_et_al_clinical_genetics_s8.csv')
+myscreen_variants<-readr::read_delim(file = './data/accessory_data/myscreen_names_to_fix.csv')
+# add refseq + chromosome accession
+myscreen_for_mutalyzer<-myscreen_variants%>%
+  #mutate(mutalyzer_input=glue('{transcript_name}:{cds_seq}'))%>%
+  left_join(refseq2gene%>%filter(!grepl('_',chrom))%>%select(chrom,name2)%>%distinct(),by=c('gene_name'='name2'))%>%
+  left_join(chr_accessions%>%select(chrom=`#chrom`,chr_refseq=name))%>% # chr accessions are for GRCH38 (!)
+  mutate(mutalyzer_input=glue('{chr_refseq}({transcript_name}):{cds_seq}'))
+
+myscreen_variants_with_hgvs<-NULL
+found_vars<-c()
+#for (i in 1:nrow(myscreen_for_mutalyzer)){
+for (i in 1:nrow(myscreen_for_mutalyzer)){
+  #is_intronic=F
+  full_variant<-myscreen_for_mutalyzer[i,]
+  var_base_name<-glue('{full_variant$transcript_name}:{full_variant$cds_seq}')
+  if (var_base_name %in% found_vars){
+    message(glue('Already found {var_base_name}. Skipping..'))
+    next
+  }
+  message(glue('{i}: {paste0(full_variant,collapse = " ")}'))
+  # if (grepl('\\+|\\-',full_variant%>%pull(mutalyzer_input))){
+  #   is_intronic=T
+  #   message('Intronic variant, adding chr accession..')
+  #   full_variant<-full_variant%>%mutate(mutalyzer_input=stringr::str_replace(glue('{chr_refseq}({mutalyzer_input}'),':','):'))
+  # }
+  variant_for_mutalyzer<-full_variant%>%pull(mutalyzer_input)
+  response<-send_variant_to_mutalyzer_normalize(variant_for_mutalyzer)
+  # if there is a difference between the transcript and the reference according to mutalyzer, add 1 to the transcript isoform and try again
+  if (response$status_code!=200){
+    parsed_variant<-data.frame(norm_hgvs=paste0(response$error_details,collapse=' '))
+  }else{
+    n_isoforms_tried<-0
+    while(n_isoforms_tried<3 & is_difference_between_reference_and_variant(response)){
+      message('There is a difference between the transcript and the reference, trying a different isoform..')
+      n_isoforms_tried<-n_isoforms_tried+1
+      original_transcript<-stringr::str_replace(full_variant$transcript_name,'\\..+','')
+      original_isoform_num<-stringr::str_replace(full_variant$transcript_name,'[^.]+','')%>%
+        stringr::str_replace('\\.','')%>%
+        as.numeric()
+      isoform_to_try<-original_isoform_num+n_isoforms_tried
+      transcript_to_try<-glue('{original_transcript}.{isoform_to_try}')
+      #full_variant<-full_variant%>%mutate(mutalyzer_input=glue('{transcript_to_try}:{cds_seq}'))
+      full_variant<-full_variant%>%mutate(mutalyzer_input=glue('{chr_refseq}({transcript_to_try}):{cds_seq}'))
+      variant_for_mutalyzer<-full_variant%>%pull(mutalyzer_input)
+      response<-send_variant_to_mutalyzer_normalize(variant_for_mutalyzer)
+    }
+    parsed_variant<-parse_mutalyzer_normalize_response_with_chr_location(response)
+    if ('g_GRCH38' %in% colnames(parsed_variant)){found_vars<-c(found_vars,var_base_name)}# make sure that not only was the variant parsed, but a genomic location was also found
+  }
+  myscreen_variants_with_hgvs<-myscreen_variants_with_hgvs%>%
+    bind_rows(data.frame(full_variant,parsed_variant))
+}
+# now need to join the myscreen_variants with the full list (because you removed duplicates before)
+final_myscreen_variants<-myscreen_variants%>%left_join(myscreen_variants_with_hgvs)
+# now remove the duplicate variants 
+final_myscreen_variants<-final_myscreen_variants%>%
+  mutate(base_var=glue('{transcript_name}:{cds_seq}'),
+         is_found=ifelse(!is.na(g_GRCH38),1,0))%>%
+  group_by(base_var)%>%slice_max(order_by = is_found)
+
+write.table(final_myscreen_variants,file='./output/preconception_screening_myscreen_202305.csv',sep='\t',row.names=F,quote=F)
+#write.table(final_myscreen_variants,file='./output/myscreen_names_to_fix_202305.csv',sep='\t',row.names=F,quote=F)
+final_myscreen_variants<-readr::read_delim('./output/preconception_screening_myscreen_202305.csv',delim='\t')
+```
+
+```{r generate bed files}
+final_myscreen_variants<-readr::read_delim('./output/preconception_screening_myscreen_202305.csv',delim='\t')
+# generate bed file
+mutalyzer_to_bed(final_myscreen_variants,bed_prefix = 'myscreen_variants_202305')
+intersect_ouput<-bedtools_intersect('./output/myscreen_variants_202305.bed',b_file='./data/accessory_data/xgen-exome-research-panel-v2-targets-hg38.bed')
+```

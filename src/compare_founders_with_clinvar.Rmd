@@ -13,6 +13,7 @@ load.project()
 ```
 
 ```{r load_data}
+acmg_v31_genes<-read_delim('./data/accessory_data/acmg_v3.1_genes.csv',delim='\t',col_names = c('gene'))
 founder_variants<-read_delim('./output/moh_variants_202202_manual_revision.csv')
 
 clinvar_variants<-vcfR::read.vcfR('./data/accessory_data/clinvar_hg38_20230311.vcf.gz')
@@ -41,6 +42,9 @@ comp_vars<-comp_vars%>%mutate(cln_sig=stringr::str_extract(INFO,'CLNSIG=[^;]+'),
                               same_hgvs=ifelse(is.na(same_hgvs),-1,same_hgvs))
 # remove those that were found but matched to additional same-pos variants in clinvar
 comp_vars<-comp_vars%>%group_by(g_GRCH38)%>%slice_max(n=1,order_by=same_hgvs)
-  
-write.table(comp_vars,file='./output/moh_202202_vs_clinvar_202303.csv',sep='\t',row.names = F)
+# add is in ACMG annotation
+comp_vars<-comp_vars%>%ungroup()%>%
+  mutate(is_acmg_actionable=ifelse(gene %in% acmg_v31_genes$gene,1,0))
+
+write.table(comp_vars,file='./output/moh_202202_vs_clinvar_202305.csv',sep='\t',row.names = F)
 ```

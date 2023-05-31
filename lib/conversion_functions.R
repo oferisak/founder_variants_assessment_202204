@@ -46,3 +46,17 @@ mutalyzer_cds_converter <- function(transcript_name,cds_change) {
   
   return(output)
 }
+
+mutalyzer_to_bed<-function(mutalyzer_df,bed_prefix='mutalyzer_to_bed_file'){
+  original_size<-nrow(mutalyzer_df)
+  mutalyzer_df<-mutalyzer_df%>%
+    mutate(grch38_position=as.numeric(stringr::str_replace_all(g_GRCH38,'^[^:]+:g.','')%>%str_extract('\\d+')))
+  bed_file<-mutalyzer_df%>%
+    filter(!is.na(g_GRCH38))%>%
+    select(chrom,start=grch38_position,end=grch38_position,base_var,gene_name)
+  bed_size<-nrow(bed_file)
+  output_file<-glue('./output/{bed_prefix}.bed')
+  message(glue('Converted {bed_size}/{original_size} variants.. writing into {output_file}'))
+  write.table(bed_file,file = output_file,quote = F,sep = '\t',row.names = F,col.names = F)
+  return(output_file)
+}

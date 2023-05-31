@@ -1,0 +1,71 @@
+---
+title: "compare founder vars against a target bed"
+author: "Ofer Isakov"
+date: '2023-03-07'
+output: html_document
+---
+
+A script that takes in the preconception screening founder variants from the MyScreen list (davidov_et_al_clinical_genetics_s8.csv)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/')
+library(ProjectTemplate)
+load.project()
+```
+
+```{r definitions}
+target_file<-'./data/accessory_data/xgen-exome-research-panel-v2-targets-hg38.pad50.bed'
+```
+
+```{r functions}
+parse_intersection_output<-function(intersect_output,founder_bed_prefix){
+  num_original_variants<-nrow(intersect_output%>%distinct())
+  not_covered_variants<-intersect_output%>%filter(V6==0)%>%
+    mutate(source=founder_bed_prefix)%>%
+    distinct()
+  num_not_covered_variants<-nrow(not_covered_variants)
+  num_intronic_variants_not_covered<-sum(grepl('+|-',not_covered_variants$V4))
+  message(glue('There are {num_not_covered_variants}/{num_original_variants} not covered variants. {num_intronic_variants_not_covered}/{num_not_covered_variants} are intronic'))
+  return(not_covered_variants)
+}
+
+```
+
+# MyScreen variants
+
+```{r myscreen}
+founder_variants<-readr::read_delim('./output/preconception_screening_myscreen_202305.csv',delim='\t')
+# generate bed file
+founder_bed_prefix<-'myscreen_variants_202305_vs_idt'
+founder_bed_file<-mutalyzer_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
+
+intersect_output<-bedtools_intersect(founder_bed_file,b_file=target_file)
+not_covered_variants<-parse_intersection_output(intersect_output,founder_bed_prefix)
+
+write.table(not_covered_variants,glue('./output/variants_vs_target_bed/{founder_bed_prefix}_not_covered.csv'),row.names = F,sep='\t',quote = F)
+
+```
+
+# MOH variants
+
+```{r moh}
+founder_variants<-readr::read_delim('./output/moh_variants_202202_manual_revision.csv',delim='\t')
+# generate bed file
+founder_bed_prefix<-'moh_variants_202202_vs_idt'
+founder_bed_file<-mutalyzer_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
+
+intersect_output<-bedtools_intersect(founder_bed_file,b_file=target_file)
+not_covered_variants<-parse_intersection_output(intersect_output,founder_bed_prefix)
+
+write.table(not_covered_variants,glue('./output/variants_vs_target_bed/{founder_bed_prefix}_not_covered.csv'),row.names = F,sep='\t',quote = F)
+
+```
+
+# Merge variant files
+
+```{r merge_files}
+not_covered_variant_files<-list.files('./output/variants_vs_target_bed')
+all_not_covered_variants<-
+
+```
