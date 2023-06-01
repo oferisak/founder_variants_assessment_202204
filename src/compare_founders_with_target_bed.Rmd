@@ -35,7 +35,11 @@ parse_intersection_output<-function(intersect_output,founder_bed_prefix){
 # MyScreen variants
 
 ```{r myscreen}
-founder_variants<-readr::read_delim('./output/preconception_screening_myscreen_202305.csv',delim='\t')
+founder_variants<-readr::read_delim('./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_202305.csv',delim='\t')
+founder_variants<-founder_variants%>%
+  mutate(cds_seq_fixed=stringr::str_replace(cds_seq,'dup.+','dup'),
+         cds_seq_fixed=stringr::str_replace(cds_seq,'del.+','del'),
+         base_var=glue('{transcript_name}:{cds_seq_fixed}'))
 # generate bed file
 founder_bed_prefix<-'myscreen_variants_202305_vs_idt'
 founder_bed_file<-mutalyzer_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
@@ -50,9 +54,13 @@ write.table(not_covered_variants,glue('./output/variants_vs_target_bed/{founder_
 # MOH variants
 
 ```{r moh}
-founder_variants<-readr::read_delim('./output/moh_variants_202202_manual_revision.csv',delim='\t')
+founder_variants<-readr::read_delim('./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_202305.csv',delim='\t')
+founder_variants<-founder_variants%>%
+  mutate(cds_seq_fixed=stringr::str_replace(cds_seq,'dup.+','dup'),
+         cds_seq_fixed=stringr::str_replace(cds_seq,'del.+','del'),
+         base_var=glue('{transcript_name}:{cds_seq_fixed}'))
 # generate bed file
-founder_bed_prefix<-'moh_variants_202202_vs_idt'
+founder_bed_prefix<-'moh_variants_202305_vs_idt'
 founder_bed_file<-mutalyzer_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
 
 intersect_output<-bedtools_intersect(founder_bed_file,b_file=target_file)
@@ -65,7 +73,18 @@ write.table(not_covered_variants,glue('./output/variants_vs_target_bed/{founder_
 # Merge variant files
 
 ```{r merge_files}
-not_covered_variant_files<-list.files('./output/variants_vs_target_bed')
-all_not_covered_variants<-
+not_covered_variant_files<-list.files('./output/variants_vs_target_bed',full.names = T)
+all_not_covered_variants<-NULL
+for (nc_file in not_covered_variant_files){
+  ncv<-readr::read_delim(nc_file,delim='\t')
+  all_not_covered_variants<-all_not_covered_variants%>%bind_rows(ncv)
+}
 
+# in its current form, the start and end positions are the same always because we want the coverage to be checked in that position.
+colnames(all_not_covered_variants)<-c('chr','start','end','variant','gene_name','x','source')
+
+write.table(all_not_covered_variants,file='./output/variants_vs_target_bed/founder_variants_not_covered_idt.202305.csv',
+            row.names = F,
+            sep='\t',
+            quote = F)
 ```

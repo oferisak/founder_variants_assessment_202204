@@ -16,49 +16,62 @@ load.project()
 
 ```{r moh_fix}
 moh_variants<-readr::read_delim(file = './data/founder_variants_lists/moh_founder_unified.csv')
-moh_variants<-moh_variants%>%mutate(gene=trimws(gene))
+moh_variants<-moh_variants%>%
+  rename(cds_seq=variant)%>%
+  mutate(gene_name=trimws(gene),
+         disease=trimws(disease),
+         cds_seq_fixed=stringr::str_replace(cds_seq,'dup.+','dup'),
+         cds_seq_fixed=stringr::str_replace(cds_seq,'del.+','del'))%>%
+  select(-gene)
 # add refseq
 moh_for_mutalyzer<-moh_variants%>%
-  left_join(refseq2gene%>%rename(gene=name2))
-moh_for_mutalyzer<-moh_for_mutalyzer%>%mutate(mutalyzer_input=glue('{X.name}:{variant}'))
-
-moh_for_mutalyzer<-moh_for_mutalyzer%>%select(-c(ethnicity,locality))%>%distinct()
-
+  left_join(refseq2gene%>%filter(!grepl('_',chrom))%>%distinct(),by=c('gene_name'='name2'))%>%
+  left_join(chr_accessions%>%select(chrom=`#chrom`,chr_refseq=name))%>%
+  rename(transcript_name=X.name)
+  
+moh_for_mutalyzer<-moh_for_mutalyzer%>%select(-c(disease,ethnicity,locality))%>%distinct()
+moh_for_mutalyzer<-moh_for_mutalyzer%>%filter(gene_name=='TK2')
 moh_variants_with_hgvs<-NULL
 found_vars<-c()
+#for (i in 1:nrow(moh_for_mutalyzer)){
 for (i in 1:nrow(moh_for_mutalyzer)){
-  is_intronic=F
   full_variant<-moh_for_mutalyzer[i,]
-  var_base_name<-glue('{full_variant$gene}:{full_variant$variant}')
-  if (var_base_name %in% found_vars){
-    message(glue('Already found {var_base_name}. Skipping..'))
-    next
-  }
-  message(glue('{i}: {paste0(full_variant,collapse = " ")}'))
-  if (grepl('\\+|\\-',full_variant%>%pull(mutalyzer_input))){
-    is_intronic=T
-    message('Intronic variant, adding chr accession..')
-    chr_a<-chr_accessions%>%filter(`#chrom`==full_variant%>%pull(chrom))%>%pull(name)
-    full_variant<-full_variant%>%mutate(mutalyzer_input=stringr::str_replace(glue('{chr_a}({mutalyzer_input}'),':','):'))
-  }
+  full_variant<-full_variant%>%mutate(mutalyzer_input=glue('{chr_refseq}({transcript_name}):{cds_seq_fixed}'))
+  var_base_name<-glue('{full_variant$gene_name}:{full_variant$cds_seq_fixed}')
+  # if (var_base_name %in% found_vars){
+  #   message(glue('Already found {var_base_name}. Skipping..'))
+  #   next
+  # }
+  message(glue('{i}: {var_base_name}'))
   variant_for_mutalyzer<-full_variant%>%pull(mutalyzer_input)
   response<-send_variant_to_mutalyzer_normalize(variant_for_mutalyzer)
   if (response$status_code!=200){
     parsed_variant<-data.frame(norm_hgvs=paste0(response$error_details,collapse=' '))
   }else{
-    parsed_variant<-parse_mutalyzer_normalize_response(response,is_intronic)
-    if ('g_GRCH38' %in% colnames(parsed_variant)){found_vars<-c(found_vars,var_base_name)}# make sure that not only was the variant parsed, but a genomic location was also found
+    parsed_variant<-parse_mutalyzer_normalize_response_with_chr_location(response)
+    if ('g_GRCH38' %in% colnames(parsed_variant)){
+      message('Found the variant.')
+      found_vars<-c(found_vars,var_base_name)
+      }# make sure that not only was the variant parsed, but a genomic location was also found
   }
   moh_variants_with_hgvs<-moh_variants_with_hgvs%>%
     bind_rows(data.frame(full_variant,parsed_variant))
 }
-# now need to jin the moh_variants with the full list (because you removed duplicates before)
-final_moh_variants<-moh_variants%>%left_join(moh_variants_with_hgvs)
-# now remove the duplicate variants 
-final_moh_variants<-final_moh_variants%>%
-  mutate(base_var=glue('{gene}:{variant}'),
-         is_found=ifelse(!is.na(g_GRCH38),1,0))%>%
-  group_by(base_var,ethnicity)%>%slice_max(order_by = is_found)
+# now for each gene grab the transcript with the highest number of hits
+moh_variants_with_hgvs<-
+  moh_variants_with_hgvs%>%
+  left_join(
+    moh_variants_with_hgvs%>%group_by(transcript_name,cds_seq_fixed)%>%summarize(grabbed_vars=sum(!is.na(g_GRCH38)))
+  )%>%
+  group_by(gene_name,cds_seq_fixed)%>%slice_max(order_by = grabbed_vars,n=1,with_ties = F)
 
-write.table(final_moh_variants,file='./output/preconception_screening_moh_202202.csv',sep='\t',row.names=F,quote=F)
+# now need to jin the moh_variants with the full list (because you removed duplicates before)
+final_moh_variants<-moh_variants%>%left_join(moh_variants_with_hgvs%>%select(-omim)%>%filter(!is.na(g_GRCH38)))
+# # now remove the duplicate variants 
+# final_moh_variants<-final_moh_variants%>%
+#   mutate(base_var=glue('{gene_name}:{cds_seq}'),
+#          is_found=ifelse(!is.na(g_GRCH38),1,0))%>%
+#   group_by(base_var,ethnicity)%>%slice_max(order_by = is_found,n = 1,with_ties = F)
+
+write.table(final_moh_variants,file='./output/preconception_screening_moh_202305.csv',sep='\t',row.names=F,quote=F)
 ```
