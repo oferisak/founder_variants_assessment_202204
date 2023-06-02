@@ -60,3 +60,16 @@ mutalyzer_to_bed<-function(mutalyzer_df,bed_prefix='mutalyzer_to_bed_file'){
   write.table(bed_file,file = output_file,quote = F,sep = '\t',row.names = F,col.names = F)
   return(output_file)
 }
+
+vep_to_bed<-function(vep_df,bed_prefix='mutalyzer_to_bed_file'){
+  original_size<-nrow(vep_df)
+  bed_file<-vep_df%>%
+    filter(!is.na(start))%>%
+    select(chr,start,end,gene,variant,hgvs_notation)%>%
+    distinct()
+  bed_size<-nrow(bed_file)
+  output_file<-glue('./output/{bed_prefix}.bed')
+  message(glue('Converted {bed_size}/{original_size} variants.. writing into {output_file}'))
+  write.table(bed_file,file = output_file,quote = F,sep = '\t',row.names = F,col.names = F)
+  return(output_file)
+}

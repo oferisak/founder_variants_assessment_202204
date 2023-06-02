@@ -37,7 +37,7 @@ BRCA1	Autosomal dominant	c.5123C>A	p.Ala1708Glu	p.A1708E	Jewish	Balkan
 BRCA1	Autosomal dominant	c.5266dup	p.Gln1756Profs	 	Jewish	Ashkenazi	
 MUTYH	Autosomal Recessive	c.536A>G	p.Tyr179Cys	Y179C	Jewish	Moroccan	
 TP53	Autosomal dominant	c.541C>T	p.Arg181Cys		Non-Jewish	Muslims	
-BRCA1	Autosomal dominant	c.5434 C>G	p.Pro1812Ala		Jewish/ Non Jeiwsh -Caucasian	Sephardi	
+BRCA1	Autosomal dominant	c.5434C>G	p.Pro1812Ala		Jewish/ Non Jeiwsh -Caucasian	Sephardi	
 BRCA1		c.5444G>A	p.Trp1815*		Arab		
 BRCA2	Autosomal dominant	c.5946delT	p.Ser1982Argfs	 	Jewish	Ashkenazi	
 BRCA2		c.6685G>T	p.Glu2229*		Arab		
@@ -51,4 +51,4 @@ BRCA2		c.771_775delTCAAA	p.Asn257fs		Arab
 BRCA2	Autosomal dominant	c.8537_8538delAG	p.Glu2846Glyfs	 	Jewish	Yemenite	
 MSH2	Autosomal dominant	c.970_971delCA	p.Gln324ValfsX8	p.Q324VfsX8	Jewish	Georgian	
 BRCA1	Autosomal dominant	c.981_982delAT	p.Cys328Terfs	aka 1100delAT	Jewish	North African	
-BRCA2	Autosomal dominant	הכפלה אקסונים 14-18 			Jewish	Iranian	
+BRCA2	Autosomal dominant	exon14-18duplication			Jewish	Iranian	

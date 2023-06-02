@@ -67,8 +67,8 @@ Progressive Cerebello Cerebro Atrophy Pontocerebellar hypoplasia type 2D (PCCA)	
 Spinal muscular atrophy ( SMA)	#253300	SMN1	Exon7 del	Israel (Jewish)	.
 Netherton Syndrome NETH	#256500	SPINK5	c.691delC	Iraq	.
 Infantile neurodegenerative disorder - Early onset progressive encephalopathy (PEBAT)	#617193	TBCD	c.1423G>A	Kochin	.
-Meckel Gruber Sy Type8	#613885	TCTN2	c .1506-2A>G	Ethiopia	.
-Meckel Gruber Sy Type8	#613885	TCTN2	c .1506-2A>G	Yemen	.
+Meckel Gruber Sy Type8	#613885	TCTN2	c.1506-2A>G	Ethiopia	.
+Meckel Gruber Sy Type8	#613885	TCTN2	c.1506-2A>G	Yemen	.
 Spastic paraplegia 49, Autosomal Recessive	#615031	TECPR2	c.3416delT	Bukhara	.
 Usher syndrome, type 2A	#276901	USH2A	c.236_239dup	Iran	.
 Progressive Cerebello Cerebro Atrophy  Pontocerebellar hypoplasia type 2E (PCCA2)	#615851	VPS53	c.1556+5G>A	Morocco	.
@@ -110,16 +110,16 @@ Cystic fibrosis (CF)	#219700	CFTR	c.3266G>A	Israel (Arab/Druze)	.
 Cystic fibrosis (CF)	#219700	CFTR	c.3883_3886delATTT	Israel (Arab/Druze)	.
 Cystic fibrosis (CF)	#219700	CFTR	c.3909C>G	Israel (Arab/Druze)	.
 Cystic fibrosis (CF)	#219700	CFTR	c.54-5940_273+10250del	Israel (Arab/Druze)	.
-Niemann-Pick disease type A,B	#257200	SMPD1	 c.573delT	North Israel (Arab/Druze)	Arab muslim
-Cockayne syndrome, type A	#216400	ERCC8	c.966C>A 	North Israel (Arab/Druze)	Arab christian
+Niemann-Pick disease type A,B	#257200	SMPD1	c.573delT	North Israel (Arab/Druze)	Arab muslim
+Cockayne syndrome, type A	#216400	ERCC8	c.966C>A	North Israel (Arab/Druze)	Arab christian
 APECED/APS1	#240300	AIRE	c.47C>T	North Israel (Arab/Druze)	Arab christian
 Pendred syndrome	#274600	SLC26A4	c.1198delT	North Israel (Arab/Druze)	Bedouin
 Microcephalic osteodysplastic (MOPDII) 	#210720	PCNT	c.3465-1G>A	North Israel (Arab/Druze)	Druze
 Carbamoyl phosphate synthetase I deficiency (CPS1d)	#237300	CPS1	c.4101+2T>C	North Israel (Arab/Druze)	Arab christian
-Carbamoyl phosphate synthetase I deficiency (CPS1d)	#237300	CPS1	c.3558+1G>C 	North Israel (Arab/Druze)	Arab christian
+Carbamoyl phosphate synthetase I deficiency (CPS1d)	#237300	CPS1	c.3558+1G>C	North Israel (Arab/Druze)	Arab christian
 Albinism, oculocutaneous, type IA	#203100	TYR	c.757G>A	North Israel (Arab/Druze)	Arab christian
 Albinism, oculocutaneous, type IA	#203100	TYR	c.1037-1G>A	North Israel (Arab/Druze)	Arab christian
-Albinism, oculocutaneous, type IA	#203100	TYR	c.896G>A 	North Israel (Arab/Druze)	Arab christian
+Albinism, oculocutaneous, type IA	#203100	TYR	c.896G>A	North Israel (Arab/Druze)	Arab christian
 Albinism, oculocutaneous, type IA	#203100	TYR	c.149C>G	North Israel (Arab/Druze)	Arab christian
 Albinism, oculocutaneous, type IA	#203100	TYR	c.1204C>T	North Israel (Arab/Druze)	Arab christian
 Albinism, oculocutaneous, type IA	#203100	TYR	c.1217C>T	North Israel (Arab/Druze)	Arab christian
@@ -183,7 +183,7 @@ Epidermolysis bullosa 	#226700	LAMB3	c.3247C>T	North Israel (Arab/Druze)	.
 Wolman disease	#278000	LIPA	c.398delC	North Israel (Arab/Druze)	.
 Severe combined immune deficiency SCID	#601457	RAG2	c.379A>T	North Israel (Arab/Druze)	.
 Spinal muscular dystrophy related disease	#604320	IGHMBP2	c.707T>G	North Israel (Arab/Druze)	.
-Progressive Familial Intrahepatic Cholestasis (PFIC) type II	#605479	ABCB11	c.3268C>T 	North Israel (Arab/Druze)	.
+Progressive Familial Intrahepatic Cholestasis (PFIC) type II	#605479	ABCB11	c.3268C>T	North Israel (Arab/Druze)	.
 Hyperphosphatasia mental retardation syndrome 4	#615716	PGAP3	c.845A>G	North Israel (Arab/Druze)	.
 Congenital Tufting Enteropathy (DIAR5)	#613217	EPCAM	deletion	North Israel (Arab/Druze)	.
 Krabbe disease 	#245200	GALC	c.1796T>G	North Israel (Arab/Druze)	.
@@ -226,7 +226,7 @@ CODAS syndrome	#600373	LONP1	c.2009C>T	North Israel (Arab/Druze)	.
 Maple syrup urine disease	#201475	DBT	c.581C>G	North Israel (Arab/Druze)	.
 Pompe	#232300	GAA	c.1210G>A	North Israel (Arab/Druze)	.
 Pompe	#232300	GAA	c.1064T>C	North Israel (Arab/Druze)	.
-Hurler	#607014	IDUA	c.1096A>C 	North Israel (Arab/Druze)	.
+Hurler	#607014	IDUA	c.1096A>C	North Israel (Arab/Druze)	.
 Mitochondrial DNA depletion syndrome 2 ( MTDPS2)	#609560	TK2	c.635T>A	North Israel (Arab/Druze)	.
 Ataxia telangiectasia (AT)	#208900	ATM	c.2284_2285delCT	North Israel (Arab/Druze)	.
 Sandhoff	#268800	HEXB	c.1082+5G>A	North Israel (Arab/Druze)	.
@@ -296,7 +296,7 @@ Mucolipidosis Type IV	#252650	MCOLN1	c.1207C>T	North Israel (Arab/Druze)	.
 Myasthenic syndrome, congenital, 4C	#608931	CHRNE	c.1319_1326+15del	North Israel (Arab/Druze)	.
 Cardiomyopathy	#610768	DOLK	c.912G>T	North Israel (Arab/Druze)	.
 Metachromatic Leukodystrophy	#250100	ARSA	c.292_293delTCinsCT	North Israel (Arab/Druze)	.
-Gray platelet syndrome	#139090	NBEAL2	c. 2701C>T	North Israel (Arab/Druze)	.
+Gray platelet syndrome	#139090	NBEAL2	c.2701C>T	North Israel (Arab/Druze)	.
 D-bifunctional protein deficiency	#261515	HSD17B4	c.944-1G>A	North Israel (Arab/Druze)	.
 Tay Sachs disease  	#272800	HEXA	c.496delC 	North Israel (Arab/Druze)	.
 Tay Sachs disease  	#272800	HEXA	c.835T>C	North Israel (Arab/Druze)	.
@@ -329,7 +329,7 @@ ATAXIA-TELANGIECTASIA; AT	#208900	ATM	c.7241_7244delAAGC	South Israel (Muslim/Dr
 ATAXIA-TELANGIECTASIA-LIKE DISORDER 1; ATLD1 	#604391	MRE11	c.290A>G	South Israel (Muslim/Druze)	.
 BARDET BIEDL SYNDROME 3, BBS3	#600151	ARL6	c.364C>T	South Israel (Muslim/Druze)	.
 BARDET-BIEDL SYNDROME 2; BBS2	#615981	BBS2	c.224T>G	South Israel (Muslim/Druze)	.
-BARDET-BIEDL SYNDROME 4; BBS4 	#615982	BBS4	c.884G>C 	South Israel (Muslim/Druze)	.
+BARDET-BIEDL SYNDROME 4; BBS4 	#615982	BBS4	c.884G>C	South Israel (Muslim/Druze)	.
 BARDET-BIEDL SYNDROME 4; BBS4 	#615982	BBS4	Del exons 3 and 4	South Israel (Muslim/Druze)	.
 BARE LYMPHOCYTE SYNDROME, TYPE II/SEVERE COMBINED IMMUNODEFICIENCY, HLA CLASS II-NEGATIVE ( SCID, HLA CLASS II-NEGATIVE)	#209920	RFX5	c.715C>T	South Israel (Muslim/Druze)	.
 BARTTER SYNDROME, TYPE 4A	#602522	BSND	c.28G>A	South Israel (Muslim/Druze)	.
@@ -346,7 +346,7 @@ CYSTIC FIBROSIS 	#219700	CFTR	c.1624G>T	South Israel (Muslim/Druze)	.
 CYSTIC FIBROSIS 	#219700	CFTR	c.892delA	South Israel (Muslim/Druze)	.
 DESMOSTEROLOSIS 	#602398	DHCR24 	c.307C>T	South Israel (Muslim/Druze)	.
 DIABETES INSIPIDUS, NEPHROGENIC, AUTOSOMAL (DIABETES INSIPIDUS, NEPHROGENIC, TYPE II)	#125800	AQP2	c.83T>C	South Israel (Muslim/Druze)	.
-DIHYDROLIPOAMIDE DEHYDROGENASE DEFICIENCY; DLDD	#246900	DLD	c.1436A>T 	South Israel (Muslim/Druze)	.
+DIHYDROLIPOAMIDE DEHYDROGENASE DEFICIENCY; DLDD	#246900	DLD	c.1436A>T	South Israel (Muslim/Druze)	.
 DISORDERED STEROIDOGENESIS DUE TO CYTOCHROME P450 OXIDOREDUCTASE DEFICIENCY 	#613571	POR	c.1615G>A	South Israel (Muslim/Druze)	.
 EPIDERMOLYSIS BULLOSA SIMPLEX, AUTOSOMAL RECESSIVE 1; EBSB1	#601001	KRT14	c.915G>A	South Israel (Muslim/Druze)	.
 GLUTARIC ACIDEMIA I; GA1	#231670	GCDH	c.505+1G>A	South Israel (Muslim/Druze)	.

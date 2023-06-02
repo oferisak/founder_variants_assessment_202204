@@ -30,7 +30,7 @@ moh_for_mutalyzer<-moh_variants%>%
   rename(transcript_name=X.name)
   
 moh_for_mutalyzer<-moh_for_mutalyzer%>%select(-c(disease,ethnicity,locality))%>%distinct()
-moh_for_mutalyzer<-moh_for_mutalyzer%>%filter(gene_name=='TK2')
+
 moh_variants_with_hgvs<-NULL
 found_vars<-c()
 #for (i in 1:nrow(moh_for_mutalyzer)){
