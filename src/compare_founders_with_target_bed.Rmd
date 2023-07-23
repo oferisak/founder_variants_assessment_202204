@@ -92,7 +92,7 @@ for (nc_file in coverage_files){
   all_coverage_variants<-all_coverage_variants%>%bind_rows(ncv)
 }
 
-write.table(all_coverage_variants,file='./output/variants_vs_target_bed/founder_variants_not_covered_idt.202305.csv',
+write.table(all_coverage_variants,file='./output/variants_vs_target_bed/founder_variants_not_covered_twist.202305.csv',
             row.names = F,
             sep='\t',
             quote = F)
