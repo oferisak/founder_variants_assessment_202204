@@ -5,7 +5,6 @@ date: '2023-03-07'
 output: html_document
 ---
 
-A script that takes in the preconception screening founder variants from the MyScreen list (davidov_et_al_clinical_genetics_s8.csv)
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -15,7 +14,14 @@ load.project()
 ```
 
 ```{r definitions}
+# target_file<-'./data/accessory_data/twist_hg38_exome_comp_spikein_v2.0.2_targets_sorted.re_annotated.pad50.bed'
+# target_name<-'twist_exome_plus'
+
 target_file<-'./data/accessory_data/xgen-exome-research-panel-v2-targets-hg38.pad50.bed'
+target_name<-'idt'
+
+output_dir<-glue('./output/variants_vs_target_bed/{target_name}')
+dir.create(output_dir)
 ```
 
 ```{r functions}
@@ -38,14 +44,14 @@ parse_intersection_output<-function(intersect_output,founder_bed_prefix){
 founder_variants<-readr::read_delim('./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep_202305.csv',delim='\t')
 founder_variants<-founder_variants%>%distinct()
 # generate bed file
-founder_bed_prefix<-'myscreen_variants_202305_vep_vs_idt'
+founder_bed_prefix<-'myscreen_variants_202305_vep'
 founder_bed_file<-vep_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
 
 intersect_output<-bedtools_intersect(founder_bed_file,b_file=target_file)
 not_covered_variants<-parse_intersection_output(intersect_output,founder_bed_prefix)
 
 founder_variants<-founder_variants%>%left_join(intersect_output)%>%mutate(source=founder_bed_prefix)
-write.table(founder_variants,glue('./output/variants_vs_target_bed/{founder_bed_prefix}_coverage.csv'),row.names = F,sep='\t',quote = F)
+write.table(founder_variants,glue('{output_dir}/{target_name}_{founder_bed_prefix}_coverage.csv'),row.names = F,sep='\t',quote = F)
 
 ```
 
@@ -54,14 +60,14 @@ write.table(founder_variants,glue('./output/variants_vs_target_bed/{founder_bed_
 ```{r moh}
 founder_variants<-readr::read_delim('./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep_202305.csv',delim='\t')
 # generate bed file
-founder_bed_prefix<-'moh_variants_202305_vs_idt_vep'
+founder_bed_prefix<-'moh_variants_202305_vs'
 founder_bed_file<-vep_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
 
 intersect_output<-bedtools_intersect(founder_bed_file,b_file=target_file)
 not_covered_variants<-parse_intersection_output(intersect_output,founder_bed_prefix)
 
 founder_variants<-founder_variants%>%left_join(intersect_output%>%select(hgvs_notation,is_covered))%>%mutate(source=founder_bed_prefix)
-write.table(founder_variants,glue('./output/variants_vs_target_bed/{founder_bed_prefix}_not_covered.csv'),row.names = F,sep='\t',quote = F)
+write.table(founder_variants,glue('{output_dir}/{target_name}_{founder_bed_prefix}_not_covered.csv'),row.names = F,sep='\t',quote = F)
 
 ```
 
@@ -70,14 +76,14 @@ write.table(founder_variants,glue('./output/variants_vs_target_bed/{founder_bed_
 ```{r moh}
 founder_variants<-readr::read_delim('./output/founder_lists_with_genomic_coordinates/onco51_panel_vep_202305.csv',delim='\t')
 # generate bed file
-founder_bed_prefix<-'onco51_panel_202305_vs_idt_vep'
+founder_bed_prefix<-'onco51_panel_202305'
 founder_bed_file<-vep_to_bed(founder_variants,bed_prefix = founder_bed_prefix)
 
 intersect_output<-bedtools_intersect(founder_bed_file,b_file=target_file)
 not_covered_variants<-parse_intersection_output(intersect_output,founder_bed_prefix)
 
 founder_variants<-founder_variants%>%left_join(intersect_output%>%select(hgvs_notation,is_covered))%>%mutate(source=founder_bed_prefix)
-write.table(founder_variants,glue('./output/variants_vs_target_bed/{founder_bed_prefix}_not_covered.csv'),row.names = F,sep='\t',quote = F)
+write.table(founder_variants,glue('{output_dir}/{target_name}_{founder_bed_prefix}_not_covered.csv'),row.names = F,sep='\t',quote = F)
 
 ```
 
@@ -85,14 +91,15 @@ write.table(founder_variants,glue('./output/variants_vs_target_bed/{founder_bed_
 # Merge variant files
 
 ```{r merge_files}
-coverage_files<-list.files('./output/variants_vs_target_bed',full.names = T)
+coverage_files<-list.files(output_dir,full.names = T)
 all_coverage_variants<-NULL
 for (nc_file in coverage_files){
   ncv<-readr::read_delim(nc_file,delim='\t')
   all_coverage_variants<-all_coverage_variants%>%bind_rows(ncv)
 }
 
-write.table(all_coverage_variants,file='./output/variants_vs_target_bed/founder_variants_not_covered_twist.202305.csv',
+write.table(all_coverage_variants,
+            file=glue('{output_dir}/{target_name}_founder_variants_not_covered.{Sys.Date()}.csv'),
             row.names = F,
             sep='\t',
             quote = F)

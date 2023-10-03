@@ -1,6 +1,7 @@
 vep_server <- "https://rest.ensembl.org"
 vep_ext <- "/vep/human/hgvs"
 
+
 vep_annotate_variants<-function(hgvs_notations){
   message(glue('VEP: submitting {length(hgvs_notations)} variants to VEP annotation..'))
   response <- POST(paste(vep_server, vep_ext, sep = ""), 
