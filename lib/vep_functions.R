@@ -1,36 +1,18 @@
 vep_server <- "https://rest.ensembl.org"
 vep_hgvs_ext <- "/vep/human/hgvs"
 
-# vep_annotate_variants<-function(hgvs_notations){
-#   message(glue('VEP: submitting {length(hgvs_notations)} variants to VEP annotation..'))
-#   response <- POST(paste(vep_server, vep_hgvs_ext, sep = ""), 
-#                    #query = list('refseq'=1,'hgvs'=1,'canonical'=1),
-#                    #content_type("application/json"),
-#                    content_type_json(),
-#                    accept_json(),
-#                    #accept("application/json"), 
-#                    body = toJSON(list('hgvs_notations' = hgvs_notations)))
-#   #body = glue('{ "hgvs_notations" : {{hgvs_notations}} }',.open = '{{',.close = '}}'))
-#   
-#   stop_for_status(response)
-#   message('VEP: Retrieved without errors.')
-#   char <- rawToChar(response$content)
-#   res<-jsonlite::fromJSON(char)
-# }
-# 
-# 
-# # coordinates should be in the format: chrX:start..end
-# vep_convert_coordinates<-function(assemb_from,assemb_to,coordinates){
-#   ext <- glue("/map/human/{assemb_from}/{coordinates}/{assemb_to}?")
-#   response <- GET(paste(vep_server, ext, sep = ""))
-#   stop_for_status(response)
-#   message('VEP: Retrieved without errors.')
-#   char <- rawToChar(response$content)
-#   res<-jsonlite::fromJSON(char)
-#   return(res$mappings$mapped%>%select(!!sym(glue('chr_{assemb_to}')):=seq_region_name,
-#                                !!sym(glue('start_{assemb_to}')):=start,
-#                                      !!sym(glue('end_{assemb_to}')):=end))
-# }
+# coordinates should be in the format: chrX:start..end
+vep_convert_coordinates<-function(assemb_from,assemb_to,coordinates){
+  ext <- glue("/map/human/{assemb_from}/{coordinates}/{assemb_to}?")
+  response <- GET(paste(vep_server, ext, sep = ""))
+  stop_for_status(response)
+  message('VEP: Retrieved without errors.')
+  char <- rawToChar(response$content)
+  res<-jsonlite::fromJSON(char)
+  return(res$mappings$mapped%>%select(!!sym(glue('chr_{assemb_to}')):=seq_region_name,
+                               !!sym(glue('start_{assemb_to}')):=start,
+                                     !!sym(glue('end_{assemb_to}')):=end))
+}
 
 vep_annotate_variants<-function(hgvs_notations,dbnsfp='REVEL_score,CADD_phred,REVEL_rankscore,VEST4_score,VEST4_rankscore,transcript_match=1'){
   notations_transcripts<-stringr::str_extract(hgvs_notations,'N[MRX]_[0-9\\.]+')
