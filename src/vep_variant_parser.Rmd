@@ -20,37 +20,56 @@ load.project()
 moh_variants<-readr::read_delim('./data/founder_variants_lists/moh_founder_unified.csv',delim='\t')
 moh_variants<-moh_variants%>%
   mutate(gene=trimws(gene),variant=trimws(variant))
+# convert problematic gene names
+moh_variants<-moh_variants%>%
+  mutate(
+    gene=case_when(
+      gene=='C8orf37'~'CFAP418',
+      gene=='G6PC'~'G6PC1',
+      !is.na(gene)~gene
+    )
+  )
+
 moh_for_vep<-moh_variants%>%
   select(gene,variant)%>%
   left_join(refseq2gene%>%filter(!grepl('_',chrom))%>%distinct(),by=c('gene'='name2'))%>%
   rename(transcript_name=X.name)%>%
   mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()
 
+
 #moh_for_vep<-moh_for_vep%>%filter(gene%in%(bad_vars%>%filter(!is.na(transcript_name))%>%pull(gene)))
 query_size<-150
 
 var_chunks<-split(moh_for_vep$hgvs_notation, ceiling(seq_along(moh_for_vep$hgvs_notation)/query_size))
 chunk_num<-1
-all_annotated_vars<-NULL
+moh_all_annotated_vars<-NULL
 for (hgvs_notations in var_chunks){
   annotated_vars<-vep_annotate_variants(hgvs_notations)
   annotated_vars<-validate_vep_variants(annotated_vars,keep=T)
-  all_annotated_vars<-all_annotated_vars%>%bind_rows(annotated_vars)
+  moh_all_annotated_vars<-moh_all_annotated_vars%>%bind_rows(annotated_vars)
 }
 
-joined_vars<-moh_for_vep%>%left_join(all_annotated_vars)
-joined_vars<-
-  joined_vars%>%group_by(gene,variant)%>%
+moh_joined_vars<-moh_for_vep%>%
+  left_join(moh_all_annotated_vars)
+moh_joined_vars<-
+  moh_joined_vars%>%group_by(gene,variant)%>%
   slice_max(order_by = verified,with_ties = F,n = 1)
 
-final_moh_variants_with_annotation<-moh_variants%>%left_join(joined_vars)
+final_moh_variants_with_annotation<-moh_variants%>%
+  left_join(moh_joined_vars)%>%
+  flatten()%>%
+  select(-c(consequence_terms))
 # fix for final table
 final_moh_variants_with_annotation<-final_moh_variants_with_annotation%>%
   mutate(comment=glue('{ethnicity} | {disease} ({omim})'),
-         chr=glue('chr{seq_region_name}'))%>%
-  select(gene,variant,hgvs_notation,chr,start,end,comment)
+         chr=glue('chr{seq_region_name}'))
+  #select(gene,variant,hgvs_notation,chr,start,end,comment)
 
-write.table(final_moh_variants_with_annotation,file='./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep_202305.csv',sep='\t',row.names=F,quote=F)
+write.table(final_moh_variants_with_annotation,
+            file=glue('./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep.{Sys.Date()}.csv'),
+            sep='\t',
+            row.names=F,
+            quote=F)
 
 ```
 
@@ -62,9 +81,16 @@ myscreen_variants<-readr::read_delim('./data/founder_variants_lists/davidov_et_a
 myscreen_variants<-myscreen_variants%>%
   mutate(gene=trimws(gene_name),variant=trimws(cds_seq))%>%
   select(-c(gene_name,cds_seq))
+
 myscreen_for_vep<-myscreen_variants%>%
   select(gene,variant,transcript_name)%>%
   mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()
+# update transcript isoform 
+
+myscreen_for_vep<-myscreen_for_vep%>%
+  mutate(original_transcript_without_isoform=stringr::str_extract(transcript_name,'N[MRX]_[0-9]+'))%>%
+  left_join(refseq2gene%>%select(latest_isoform=X.name,original_transcript_without_isoform))%>%
+  mutate(transcript_name=latest_isoform)
 
 # now fix problematic variants
 myscreen_for_vep<-
@@ -85,7 +111,9 @@ myscreen_for_vep<-
              hgvs_notation=='NM_001127464.2:c.5943delA'~'NM_001367624.2:c.8627A>G',
              !is.na(hgvs_notation)~hgvs_notation
              )
-         )%>%mutate(hgvs_notation=hgvs_notation_fixed)%>%select(-hgvs_notation_fixed)
+         )%>%
+  mutate(hgvs_notation=hgvs_notation_fixed)%>%select(-hgvs_notation_fixed)%>%
+  filter(!hgvs_notation%in%c('NM_153700.2:c.-78_5091+41del18645'))# filter out problematic variants
 
 
 #myscreen_for_vep<-myscreen_for_vep%>%filter(gene%in%(bad_vars%>%filter(!is.na(transcript_name))%>%pull(gene)))
@@ -93,26 +121,28 @@ query_size<-150
 
 var_chunks<-split(myscreen_for_vep$hgvs_notation, ceiling(seq_along(myscreen_for_vep$hgvs_notation)/query_size))
 chunk_num<-1
-all_annotated_vars<-NULL
+myscreen_all_annotated_vars<-NULL
 for (hgvs_notations in var_chunks){
   annotated_vars<-vep_annotate_variants(hgvs_notations)
   annotated_vars<-validate_vep_variants(annotated_vars,keep=T)
-  all_annotated_vars<-all_annotated_vars%>%bind_rows(annotated_vars)
+  myscreen_all_annotated_vars<-myscreen_all_annotated_vars%>%bind_rows(annotated_vars)
 }
 
-joined_vars<-myscreen_for_vep%>%left_join(all_annotated_vars)
-joined_vars<-
-  joined_vars%>%group_by(gene,variant)%>%
+myscreen_joined_vars<-myscreen_for_vep%>%left_join(myscreen_all_annotated_vars)
+myscreen_joined_vars<-
+  myscreen_joined_vars%>%group_by(gene,variant)%>%
   slice_max(order_by = verified,with_ties = F,n = 1)
 
-final_myscreen_variants_with_annotation<-myscreen_variants%>%left_join(joined_vars)
+final_myscreen_variants_with_annotation<-myscreen_variants%>%
+  left_join(myscreen_joined_vars)%>%
+  flatten()%>%
+  select(-c(consequence_terms,flags))
 final_myscreen_variants_with_annotation<-final_myscreen_variants_with_annotation%>%
   mutate(comment=glue('{protein_seq}'),
-         chr=glue('chr{seq_region_name}'))%>%
-  select(gene,variant,hgvs_notation,chr,start,end,comment)
+         chr=glue('chr{seq_region_name}'))
 
 
-write.table(final_myscreen_variants_with_annotation,file='./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep_202305.csv',sep='\t',row.names=F,quote=F)
+write.table(final_myscreen_variants_with_annotation,file=glue('./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.{Sys.Date()}.csv'),sep='\t',row.names=F,quote=F)
 
 ```
 
@@ -126,31 +156,63 @@ onco51_for_vep<-onco51_variants%>%
   select(gene,variant)%>%
   left_join(refseq2gene%>%filter(!grepl('_',chrom))%>%distinct(),by=c('gene'='name2'))%>%
   rename(transcript_name=X.name)%>%
-  mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()
+  mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()%>%
+  filter(hgvs_notation!='NM_004329.3:c.-153+13146_*357832del')
 
 #onco51_for_vep<-onco51_for_vep%>%filter(gene%in%(bad_vars%>%filter(!is.na(transcript_name))%>%pull(gene)))
 query_size<-150
 
 var_chunks<-split(onco51_for_vep$hgvs_notation, ceiling(seq_along(onco51_for_vep$hgvs_notation)/query_size))
 chunk_num<-1
-all_annotated_vars<-NULL
+onco_all_annotated_vars<-NULL
 for (hgvs_notations in var_chunks){
   annotated_vars<-vep_annotate_variants(hgvs_notations)
   annotated_vars<-validate_vep_variants(annotated_vars,keep=T)
-  all_annotated_vars<-all_annotated_vars%>%bind_rows(annotated_vars)
+  onco_all_annotated_vars<-onco_all_annotated_vars%>%bind_rows(annotated_vars)
 }
 
-joined_vars<-onco51_for_vep%>%left_join(all_annotated_vars)
-joined_vars<-
-  joined_vars%>%group_by(gene,variant)%>%
+onco_joined_vars<-onco51_for_vep%>%left_join(onco_all_annotated_vars)
+onco_joined_vars<-
+  onco_joined_vars%>%group_by(gene,variant)%>%
   slice_max(order_by = verified,with_ties = F,n = 1)
 
-final_onco51_variants_with_annotation<-onco51_variants%>%left_join(joined_vars)
+final_onco51_variants_with_annotation<-onco51_variants%>%
+  left_join(onco_joined_vars)%>%
+  flatten()%>%
+  select(-consequence_terms)
 final_onco51_variants_with_annotation<-final_onco51_variants_with_annotation%>%
   mutate(ethnicity=ifelse(is.na(ethnicity),'',ethnicity),
          comment=glue('{sector} {ethnicity} | {`Mode of Inheritance`}'),
-         chr=glue('chr{seq_region_name}'))%>%
-  select(gene,variant,hgvs_notation,chr,start,end,comment)
+         chr=glue('chr{seq_region_name}'))
 
-write.table(final_onco51_variants_with_annotation,file='./output/founder_lists_with_genomic_coordinates/onco51_panel_vep_202305.csv',sep='\t',row.names=F,quote=F)
+write.table(final_onco51_variants_with_annotation,file=glue('./output/founder_lists_with_genomic_coordinates/onco51_panel_vep.{Sys.Date()}.csv'),sep='\t',row.names=F,quote=F)
+```
+
+
+```{r add_grch37_coordinates}
+assemb_from<-'GRCh38'
+assemb_to<-'GRCh37'
+
+input_files<-c(#'./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep_202305.csv',
+               './output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep_202305.csv',
+               './output/founder_lists_with_genomic_coordinates/onco51_panel_vep_202305.csv')
+
+
+for (input_file in input_files){
+  message(glue('Annotating {input_file}'))
+  input_vars<-readr::read_delim(input_file,delim='\t',na = 'NA')
+  output_vars<-NULL
+  for (i in 1:nrow(input_vars)){
+    var<-input_vars%>%slice(i)%>%
+      mutate(var_coords=glue('{chr}:{start}..{end}'))
+    if (!is.na(var%>%pull(start))){
+      message(glue('converting {var%>%pull(var_coords)}'))
+      converted_coords<-vep_convert_coordinates(assemb_from,assemb_to,coordinates = var%>%pull(var_coords))
+      var<-var%>%bind_cols(converted_coords)
+    }
+    output_vars<-output_vars%>%bind_rows(var)
+  }
+  output_file_name<-glue("{stringr::str_replace(basename(input_file),'.csv','')}.with{assemb_to}.csv")
+  write.table(output_vars,file=glue('./output/founder_lists_with_genomic_coordinates/{output_file_name}'),row.names = F,sep='\t')
+}
 ```

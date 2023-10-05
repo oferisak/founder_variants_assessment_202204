@@ -1,6 +1,10 @@
 chr_refseq2ucsc<-read.table('/media/SSD/Bioinformatics/Databases/refseq/chromosomes_refseq_to_ucsc_20211101.txt.gz',sep='\t',header=T,quote = '',comment.char = '')
 # refseq to gene
-refseq2gene<-read.table('/media/SSD/Bioinformatics/Databases/refseq/refseq_to_gene_20211101.txt.gz',sep='\t',header=T,quote = '',comment.char = '')
+refseq2gene<-read.table('/media/SSD/Bioinformatics/Databases/refseq/refseq_curated_to_gene.20231004.csv.gz',sep='\t',header=T,quote = '',comment.char = '')
+colnames(refseq2gene)<-c('X.name','chrom','name2')
+refseq2gene<-refseq2gene%>%
+  filter(!grepl('_',chrom))%>%
+  mutate(original_transcript_without_isoform=stringr::str_extract(X.name,'N[MRX]_[0-9]+'))
 
 mutalyzer_cds_converter <- function(transcript_name,cds_change) {
   transcript_found<-F
