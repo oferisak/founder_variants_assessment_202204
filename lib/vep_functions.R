@@ -42,7 +42,7 @@ vep_cds_to_genomic_coordinates<-function(hgvs_notation,build='grch37'){
   }
   vep_hgvs_ext <- "/vep/human/hgvs/:hgvs_notation"
   message(glue('Parsing {hgvs_notation} with build {build}'))
-  ext <- glue("/vep/human/hgvs/{hgvs_notation}?refseq=true&canonical=true&ambiguous_hgvs=1&pick=1")
+  ext <- glue("/vep/human/hgvs/{hgvs_notation}?refseq=true&canonical=true&ambiguous_hgvs=1&pick=1&hgvs=1")
   
   r <- GET(paste(server, ext, sep = ""), content_type("application/json"))
   char <- rawToChar(r$content)
