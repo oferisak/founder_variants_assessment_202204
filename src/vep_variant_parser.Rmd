@@ -66,76 +66,58 @@ translate_amino_acids <- function(aa_change,protein_start) {
 
 ```
 
-# MyScreen variants
+# MyScreen variants - revised
 
 ```{r definitions}
 
 myscreen_variants<-readr::read_delim('./data/founder_variants_lists/davidov_et_al_clinical_genetics_s8.csv',delim='\t')
-myscreen_variants<-myscreen_variants%>%
-  mutate(gene=trimws(gene_name),variant=trimws(cds_seq))%>%
-  select(-c(gene_name,cds_seq))
-
 myscreen_for_vep<-myscreen_variants%>%
-  select(gene,variant,transcript_name)%>%
-  mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()
-# update transcript isoform 
+  mutate(gene=trimws(gene_name),variant=trimws(cds_seq))%>%
+  select(-c(gene_name,cds_seq))%>%
+  mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()%>%
+  filter(grepl('NM_',hgvs_notation))
 
-myscreen_for_vep<-myscreen_for_vep%>%
-  mutate(original_transcript_without_isoform=stringr::str_extract(transcript_name,'N[MRX]_[0-9]+'))%>%
-  left_join(refseq2gene%>%select(latest_isoform=X.name,original_transcript_without_isoform))%>%
-  mutate(transcript_name=latest_isoform)
+# update transcript isoform 
+# myscreen_for_vep<-myscreen_for_vep%>%
+#   mutate(original_transcript_without_isoform=stringr::str_extract(transcript_name,'N[MRX]_[0-9]+'))%>%
+#   left_join(refseq2gene%>%select(latest_isoform=X.name,original_transcript_without_isoform))%>%
+#   mutate(transcript_name=latest_isoform)
 
 # now fix problematic variants
-myscreen_for_vep<-
-  myscreen_for_vep%>%
-  mutate(hgvs_notation_fixed=
-           case_when(
-             hgvs_notation=='NM_015120.4:c.8008C>T'~'NM_001378454.1:c.8005C>T',
-             hgvs_notation=='NM_000186.3:c.3677_*4del'~'NM_000186.4:c.3677_*4del',
-             hgvs_notation=='NM_080680.2:c.3991C>T'~'NM_080680.3:c.3991C>T',
-             hgvs_notation=='NM_183380.3:c.14865delA'~'NM_183380.4:c.14865del',
-             hgvs_notation=='NM_000213.3:c.3280_3793+176del2279'~'NM_000213.5:c.3279_3793+180del',
-             hgvs_notation=='NM_002225.4:c.932C>T'~'NM_002225.5:c.932C>T',
-             hgvs_notation=='NM_018993.3:c.1731delC'~'NM_018993.4:c.1731del',
-             hgvs_notation=='NM_001164277.1:c.1179G>A'~'NM_001164277.2:c.1179G>A',
-             hgvs_notation=='NM_001164277.1:c.446G>A'~'NM_001164277.2:c.446G>A',
-             hgvs_notation=='NM_001164277.1:c.83G>A'~'NM_001164277.2:c.83G>A',
-             hgvs_notation=='NM_002420.5:c.-64+2213_899+118del36444'~'NM_002420.6:c.-64+2213_899+118del36444',
-             hgvs_notation=='NM_001127464.2:c.5943delA'~'NM_001367624.2:c.8627A>G',
-             !is.na(hgvs_notation)~hgvs_notation
-             )
-         )%>%
-  mutate(hgvs_notation=hgvs_notation_fixed)%>%select(-hgvs_notation_fixed)%>%
-  filter(!hgvs_notation%in%c('NM_153700.2:c.-78_5091+41del18645'))# filter out problematic variants
+# myscreen_for_vep<-
+#   myscreen_for_vep%>%
+#   mutate(hgvs_notation_fixed=
+#            case_when(
+#              hgvs_notation=='NM_015120.4:c.8008C>T'~'NM_001378454.1:c.8005C>T',
+#              hgvs_notation=='NM_000186.3:c.3677_*4del'~'NM_000186.4:c.3677_*4del',
+#              hgvs_notation=='NM_080680.2:c.3991C>T'~'NM_080680.3:c.3991C>T',
+#              hgvs_notation=='NM_183380.3:c.14865delA'~'NM_183380.4:c.14865del',
+#              hgvs_notation=='NM_000213.3:c.3280_3793+176del2279'~'NM_000213.5:c.3279_3793+180del',
+#              hgvs_notation=='NM_002225.4:c.932C>T'~'NM_002225.5:c.932C>T',
+#              hgvs_notation=='NM_018993.3:c.1731delC'~'NM_018993.4:c.1731del',
+#              hgvs_notation=='NM_001164277.1:c.1179G>A'~'NM_001164277.2:c.1179G>A',
+#              hgvs_notation=='NM_001164277.1:c.446G>A'~'NM_001164277.2:c.446G>A',
+#              hgvs_notation=='NM_001164277.1:c.83G>A'~'NM_001164277.2:c.83G>A',
+#              hgvs_notation=='NM_002420.5:c.-64+2213_899+118del36444'~'NM_002420.6:c.-64+2213_899+118del36444',
+#              hgvs_notation=='NM_001127464.2:c.5943delA'~'NM_001367624.2:c.8627A>G',
+#              !is.na(hgvs_notation)~hgvs_notation
+#              )
+#          )%>%
+#   mutate(hgvs_notation=hgvs_notation_fixed)%>%select(-hgvs_notation_fixed)%>%
+#   filter(!hgvs_notation%in%c('NM_153700.2:c.-78_5091+41del18645'))# filter out problematic variants
 
-
-#myscreen_for_vep<-myscreen_for_vep%>%filter(gene%in%(bad_vars%>%filter(!is.na(transcript_name))%>%pull(gene)))
-query_size<-150
-
-var_chunks<-split(myscreen_for_vep$hgvs_notation, ceiling(seq_along(myscreen_for_vep$hgvs_notation)/query_size))
-chunk_num<-1
-myscreen_all_annotated_vars<-NULL
-for (hgvs_notations in var_chunks){
-  annotated_vars<-vep_annotate_variants(hgvs_notations)
-  annotated_vars<-validate_vep_variants(annotated_vars,keep=T)
-  myscreen_all_annotated_vars<-myscreen_all_annotated_vars%>%bind_rows(annotated_vars)
+myscreen_for_vep_annotated<-NULL
+for (i in 1:nrow(myscreen_for_vep)){
+  message(glue('{i}/{nrow(myscreen_for_vep)}'))
+  variant<-myscreen_for_vep%>%slice(i)
+  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37')
+  annotated_variant<-variant%>%left_join(variant_position)
+  myscreen_for_vep_annotated<-myscreen_for_vep_annotated%>%bind_rows(annotated_variant)
 }
 
-myscreen_joined_vars<-myscreen_for_vep%>%left_join(myscreen_all_annotated_vars)
-myscreen_joined_vars<-
-  myscreen_joined_vars%>%group_by(gene,variant)%>%
-  slice_max(order_by = verified,with_ties = F,n = 1)
+validated_myscreen_for_vep_annotated<-myscreen_for_vep_annotated%>%filter(!grepl('HG|HS',chr))
 
-final_myscreen_variants_with_annotation<-myscreen_variants%>%
-  left_join(myscreen_joined_vars)%>%
-  flatten()%>%
-  select(-c(consequence_terms,flags))
-final_myscreen_variants_with_annotation<-final_myscreen_variants_with_annotation%>%
-  mutate(comment=glue('{protein_seq}'),
-         chr=glue('chr{seq_region_name}'))
-
-
-write.table(final_myscreen_variants_with_annotation,file=glue('./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.{Sys.Date()}.csv'),sep='\t',row.names=F,quote=F)
+write.table(validated_myscreen_for_vep_annotated%>%select(-c(consequence_terms,flags)),file=glue('./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.{Sys.Date()}.csv'),sep='\t',row.names=F,quote=F)
 
 ```
 
