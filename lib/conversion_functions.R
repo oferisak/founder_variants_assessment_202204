@@ -65,12 +65,26 @@ mutalyzer_to_bed<-function(mutalyzer_df,bed_prefix='mutalyzer_to_bed_file'){
   return(output_file)
 }
 
-vep_to_bed<-function(vep_df,bed_prefix='mutalyzer_to_bed_file'){
+vep_to_bed<-function(vep_df,bed_prefix='mutalyzer_to_bed_file',add_chr=F){
   original_size<-nrow(vep_df)
   bed_file<-vep_df%>%
     filter(!is.na(start))%>%
     select(chr,start,end,gene,variant,hgvs_notation)%>%
     distinct()
+  # fix it so that the start is always before the end
+  fixed_bed_file<-NULL
+  for (i in 1:nrow(bed_file)){
+    bed_line<-bed_file%>%slice(i)
+    new_bed_line<-bed_line
+    if (bed_line$start>bed_line$end){
+      new_bed_line<-new_bed_line%>%mutate(start=bed_line$end,end=bed_line$start)
+    }
+    fixed_bed_file<-fixed_bed_file%>%bind_rows(new_bed_line)
+  }
+  bed_file<-fixed_bed_file
+  if (add_chr){
+    bed_file<-bed_file%>%mutate(chr=glue('chr{chr}'))
+  }
   bed_size<-nrow(bed_file)
   output_file<-glue('./output/{bed_prefix}.bed')
   message(glue('Converted {bed_size}/{original_size} variants.. writing into {output_file}'))

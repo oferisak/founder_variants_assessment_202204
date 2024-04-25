@@ -5,12 +5,6 @@ date: '2023-03-07'
 output: html_document
 ---
 
-# USE NOTES
-- using vep_cds_to_genomic_coordinates - takes in an hgvs notation and returns the hg38 genomic coordinates
-- if you want to convert from gene symbol with coordinates to genomic coordinates - you need to first find all the corresponding transcripts (using refseq2gene)
-- there will be different transcripts with the same cds notation but with different genomic locations. the variant table should have a way to determine which is the correct one otherwise there is no way of knowing.
-
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 setwd('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/')
@@ -77,45 +71,54 @@ myscreen_for_vep<-myscreen_variants%>%
   mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()%>%
   filter(grepl('NM_',hgvs_notation))
 
-# update transcript isoform 
-# myscreen_for_vep<-myscreen_for_vep%>%
-#   mutate(original_transcript_without_isoform=stringr::str_extract(transcript_name,'N[MRX]_[0-9]+'))%>%
-#   left_join(refseq2gene%>%select(latest_isoform=X.name,original_transcript_without_isoform))%>%
-#   mutate(transcript_name=latest_isoform)
-
-# now fix problematic variants
-# myscreen_for_vep<-
-#   myscreen_for_vep%>%
-#   mutate(hgvs_notation_fixed=
-#            case_when(
-#              hgvs_notation=='NM_015120.4:c.8008C>T'~'NM_001378454.1:c.8005C>T',
-#              hgvs_notation=='NM_000186.3:c.3677_*4del'~'NM_000186.4:c.3677_*4del',
-#              hgvs_notation=='NM_080680.2:c.3991C>T'~'NM_080680.3:c.3991C>T',
-#              hgvs_notation=='NM_183380.3:c.14865delA'~'NM_183380.4:c.14865del',
-#              hgvs_notation=='NM_000213.3:c.3280_3793+176del2279'~'NM_000213.5:c.3279_3793+180del',
-#              hgvs_notation=='NM_002225.4:c.932C>T'~'NM_002225.5:c.932C>T',
-#              hgvs_notation=='NM_018993.3:c.1731delC'~'NM_018993.4:c.1731del',
-#              hgvs_notation=='NM_001164277.1:c.1179G>A'~'NM_001164277.2:c.1179G>A',
-#              hgvs_notation=='NM_001164277.1:c.446G>A'~'NM_001164277.2:c.446G>A',
-#              hgvs_notation=='NM_001164277.1:c.83G>A'~'NM_001164277.2:c.83G>A',
-#              hgvs_notation=='NM_002420.5:c.-64+2213_899+118del36444'~'NM_002420.6:c.-64+2213_899+118del36444',
-#              hgvs_notation=='NM_001127464.2:c.5943delA'~'NM_001367624.2:c.8627A>G',
-#              !is.na(hgvs_notation)~hgvs_notation
-#              )
-#          )%>%
-#   mutate(hgvs_notation=hgvs_notation_fixed)%>%select(-hgvs_notation_fixed)%>%
-#   filter(!hgvs_notation%in%c('NM_153700.2:c.-78_5091+41del18645'))# filter out problematic variants
-
 myscreen_for_vep_annotated<-NULL
 for (i in 1:nrow(myscreen_for_vep)){
+#for (i in 1:100){
   message(glue('{i}/{nrow(myscreen_for_vep)}'))
   variant<-myscreen_for_vep%>%slice(i)
-  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37')
-  annotated_variant<-variant%>%left_join(variant_position)
+  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq = 'refseq')
+  if ((nrow(variant_position)>0) &&(!('error' %in% colnames(variant_position))) ){
+    annotated_variant<-variant%>%left_join(variant_position)
+  }else{ # if the transcript was not found, use the gene name instead
+    variant_position<-vep_cds_to_genomic_coordinates(glue('{variant%>%pull(gene)}:{variant%>%pull(variant)}'),build='grch37',gene_symbol_or_refseq = 'gene_symbol')
+    if ((nrow(variant_position)>0) &&(!('error' %in% colnames(variant_position))) ){
+      annotated_variant<-variant%>%select(-hgvs_notation)%>%bind_cols(variant_position%>%mutate(hgvs_notation=hgvsc))
+    }else{
+      message('could not parse the variant both by transcript and by gene')
+      annotated_variant<-variant
+    }
+  }
   myscreen_for_vep_annotated<-myscreen_for_vep_annotated%>%bind_rows(annotated_variant)
 }
 
-validated_myscreen_for_vep_annotated<-myscreen_for_vep_annotated%>%filter(!grepl('HG|HS',chr))
+validated_myscreen_for_vep_annotated<-myscreen_for_vep_annotated%>%filter(!grepl('HG|HS',chr))%>%distinct(hgvsc,.keep_all = T)
+# validate CDS
+validated_myscreen_for_vep_annotated<-validated_myscreen_for_vep_annotated%>%
+  mutate(original_hgvs_cds=stringr::str_extract(variant,'c\\..+')%>%stringr::str_replace('del.+','del')%>%
+           stringr::str_replace('dup.+','dup'),
+         annotation_hgvs_cds=stringr::str_extract(hgvsc,'c\\..+'))%>%
+  mutate(cds_start_match=ifelse(original_hgvs_cds==annotation_hgvs_cds,1,0),
+         cds_start_match=ifelse(is.na(cds_start_match),0,cds_start_match))%>%
+  group_by(transcript_name,variant)%>%
+  slice_max(cds_start_match)%>%ungroup()
+# validate Protein seq
+validated_myscreen_for_vep_annotated<-validated_myscreen_for_vep_annotated%>%
+  mutate(original_p=stringr::str_replace_all(protein_seq,'p\\.\\(|\\)','')%>%stringr::str_replace('\\d+',''),
+         annotation_p=stringr::str_replace_all(hgvsp,'.+p\\.','')%>%stringr::str_replace('Ter','*')%>%stringr::str_replace('\\d+',''))%>%
+  mutate(p_match=ifelse(original_p==annotation_p,1,0),
+         p_match=ifelse(is.na(p_match),0,p_match))%>%
+  group_by(transcript_name,variant)%>%
+  slice_max(p_match)%>%ungroup()
+# pick cannonical
+validated_myscreen_for_vep_annotated<-validated_myscreen_for_vep_annotated%>%
+  group_by(transcript_name,variant)%>%
+  slice_max(canonical)%>%ungroup()
+
+# remove ambiguous variants
+ambiguous_variants<-validated_myscreen_for_vep_annotated%>%select(gene,variant)%>%filter(duplicated(validated_myscreen_for_vep_annotated%>%select(gene,variant)))%>%distinct()
+validated_myscreen_for_vep_annotated<-validated_myscreen_for_vep_annotated%>%
+  filter(!(gene%in%ambiguous_variants$gene & variant%in%ambiguous_variants$variant))
+
 
 write.table(validated_myscreen_for_vep_annotated%>%select(-c(consequence_terms,flags)),file=glue('./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.{Sys.Date()}.csv'),sep='\t',row.names=F,quote=F)
 
@@ -133,7 +136,7 @@ onco51_for_vep_annotated<-NULL
 for (i in 1:nrow(onco51_for_vep)){
   message(glue('{i}/{nrow(onco51_for_vep)}'))
   variant<-onco51_for_vep%>%slice(i)
-  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37')
+  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq = 'gene_symbol')
   annotated_variant<-variant%>%left_join(variant_position)
   onco51_for_vep_annotated<-onco51_for_vep_annotated%>%bind_rows(annotated_variant)
 }
@@ -142,30 +145,29 @@ for (i in 1:nrow(onco51_for_vep)){
 # remove duplicate genomic regions
 validated_onco51_for_vep_annotated<-onco51_for_vep_annotated%>%
   distinct(gene,variant,ethnicity,sector,chr,start,end,.keep_all = TRUE)%>%ungroup()
-# grab the original cds position and compare to the cds_start
+# validate cds notation
 validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
-  mutate(original_cds_start=stringr::str_extract(variant,'\\d+'))%>%
-  mutate(cds_start_match=ifelse(original_cds_start==cds_start,1,0),
+  mutate(original_hgvs_cds=stringr::str_replace(variant,'del.+','del')%>%stringr::str_replace('dup.+','dup'),
+         annotation_hgvs_cds=stringr::str_extract(hgvsc,'c\\..+'))%>%
+  mutate(cds_start_match=ifelse(original_hgvs_cds==annotation_hgvs_cds,1,0),
          cds_start_match=ifelse(is.na(cds_start_match),0,cds_start_match))%>%
   group_by(gene,variant,ethnicity,sector)%>%
   slice_max(cds_start_match)%>%ungroup()
-# grab the original protein position and compare to the protein_start
+# compare start protein
 validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
-  mutate(original_protein_start=stringr::str_extract(protein,'\\d+'))%>%
-  mutate(protein_start_match=ifelse(original_protein_start==protein_start,1,0),
-         protein_start_match=ifelse(is.na(protein_start_match),0,protein_start_match))%>%
+  mutate(original_protein=stringr::str_extract(protein,'p\\..+')%>%stringr::str_replace('\\d+.+',''),
+         annotation_protein=stringr::str_extract(hgvsp,'p\\..+')%>%stringr::str_replace('\\d+.+',''))%>%
+  mutate(protein_match=ifelse(original_protein==annotation_protein,1,0),
+         protein_match=ifelse(is.na(protein_match),0,protein_match))%>%
   group_by(gene,variant,ethnicity,sector)%>%
-  slice_max(protein_start_match)%>%ungroup()
-# grab the original first aa and compare to the annotation aa
+  slice_max(protein_match)%>%ungroup()
+# compare protein notation
 validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
-  separate(amino_acids,sep='/',into=c('first_aa','second_aa'))%>%
-  mutate(original_first_aa=stringr::str_extract(protein,'p.[^\\d]+')%>%str_replace('p.',''))%>%
-  rowwise()%>%
-  mutate(first_aa_translated=ifelse(first_aa %in% names(amino_acids),amino_acids[[first_aa]],NA))%>%
-  mutate(first_aa_match=ifelse(original_first_aa==first_aa_translated,1,0),
-         first_aa_match=ifelse(is.na(first_aa_match),0,first_aa_match))%>%
+  mutate(annotation_protein=stringr::str_extract(hgvsp,'p\\..+'))%>%
+  mutate(protein_match=ifelse(protein==annotation_protein,1,0),
+         protein_match=ifelse(is.na(protein_match),0,protein_match))%>%
   group_by(gene,variant,ethnicity,sector)%>%
-  slice_max(first_aa_match)%>%ungroup()
+  slice_max(protein_match)%>%ungroup()
 # if the variant is intronic (has +/- in the notation) then select the matching variant without cds
 validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
   mutate(original_is_intronic=ifelse(grepl('\\+|\\-',variant),1,0))%>%
@@ -173,6 +175,14 @@ validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
   mutate(match_is_intronic=ifelse(original_is_intronic==is_intronic,1,0))%>%
   group_by(gene,variant,ethnicity,sector)%>%
   slice_max(match_is_intronic)%>%ungroup()
+# fix deletions
+validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
+  mutate(hgvs_del_ref=stringr::str_extract(hgvs_notation,'del.+'),
+         annotation_del_ref=glue('del{ref}'))%>%
+  mutate(del_match=ifelse(hgvs_del_ref==annotation_del_ref,1,0),
+         del_match=ifelse(is.na(del_match),0,del_match))%>%
+  group_by(gene,variant,ethnicity,sector)%>%
+  slice_max(del_match)%>%ungroup()
 
 # grab remaining duplicates
 remaining_duplicates<-validated_onco51_for_vep_annotated%>%
@@ -180,7 +190,10 @@ remaining_duplicates<-validated_onco51_for_vep_annotated%>%
 # manually select the correct variants
 validated_onco51_for_vep_annotated<-validated_onco51_for_vep_annotated%>%
   filter(!(hgvs_notation=='BRCA1:c.5266dup' & start!=41209081))%>% 
-  filter(!(hgvs_notation=='BRCA1:c.5434C>G' & start!=41199693))
+  filter(!(hgvs_notation=='BRCA1:c.5434C>G' & start!=41199693))%>%
+  filter(!(hgvs_notation=='BRCA1:c.5123C>A' & start!=41215920))%>%
+  filter(!(hgvs_notation=='CHEK2:c.499G>A' & start!=29121058))%>%
+  filter(!(hgvs_notation=='MSH6:c.3603_3606delCATG' & start!=48032803))
 
 write.table(validated_onco51_for_vep_annotated%>%select(-consequence_terms),
             file=glue('./output/founder_lists_with_genomic_coordinates/onco51_founder_variants_vep.{Sys.Date()}.csv'),
@@ -219,25 +232,10 @@ moh_for_vep_annotated<-NULL
 for (i in 1:nrow(moh_for_vep)){
   message(glue('{i}/{nrow(moh_for_vep)}'))
   variant<-moh_for_vep%>%slice(i)
-  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37')
+  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq = 'gene_symbol')
   annotated_variant<-variant%>%left_join(variant_position)
   moh_for_vep_annotated<-moh_for_vep_annotated%>%bind_rows(annotated_variant)
 }
-
-compare_with_original<-function(original_table,modified_table){
-  missing_variants<-NULL
-  for (i in 1:nrow(original_table)){
-    original_variant<-original_table%>%slice(i)
-    if (!original_variant%>%pull(hgvs_notation) %in% modified_table$hgvs_notation){
-      missing_variants<-missing_variants%>%bind_rows(original_variant)
-    }else{
-      message(glue('found {original_variant%>%pull(hgvs_notation)}'))
-    }
-  }
-  return(missing_variants)
-}
-
-compare_with_original(moh_for_vep,moh_for_vep_annotated)
 
 # validate
 # remove duplicate genomic regions
@@ -268,18 +266,21 @@ validated_moh_for_vep_annotated<-validated_moh_for_vep_annotated%>%
   group_by(gene,variant,ethnicity,locality)%>%
   slice_max(match_is_intronic)%>%ungroup()
 
-# manually select the correct variants
+# fix deletions
 validated_moh_for_vep_annotated<-validated_moh_for_vep_annotated%>%
-  filter(!(hgvs_notation=='PGM1:c.112A>T' & start!=64059271))%>%
-  filter(!(hgvs_notation=='HEXA:c.835T>C' & start!=72641571))%>%
-  filter(!(hgvs_notation=='CPS1:c.3392C>T' & start!=211513252))%>%
-  filter(!(hgvs_notation=='PCDH15:c.733C>T' & start!=56077174))%>%
-  filter(!(hgvs_notation=='POR:c.1606G>A' & start!=75615113))
+  mutate(hgvs_del_ref=stringr::str_extract(hgvs_notation,'del.+'),
+         annotation_del_ref=glue('del{ref}'))%>%
+  mutate(del_match=ifelse(hgvs_del_ref==annotation_del_ref,1,0),
+         del_match=ifelse(is.na(del_match),0,del_match))%>%
+  group_by(gene,variant,ethnicity,locality)%>%
+  slice_max(del_match)%>%ungroup()
 
+# grab remaining duplicates
 remaining_duplicates<-validated_moh_for_vep_annotated%>%
-  filter(duplicated(validated_moh_for_vep_annotated%>%select(gene,hgvs_notation,ethnicity,locality)))%>%distinct()
+  filter(duplicated(validated_moh_for_vep_annotated%>%select(gene,variant,ethnicity,locality)))%>%select(hgvs_notation)%>%distinct()
 
-
+# remove ambiguous
+validated_moh_for_vep_annotated<-validated_moh_for_vep_annotated%>%filter(!hgvs_notation%in%remaining_duplicates$hgvs_notation)
 
 write.table(validated_moh_for_vep_annotated%>%select(-consequence_terms),
             file=glue('./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep.{Sys.Date()}.csv'),
@@ -294,54 +295,95 @@ write.table(validated_moh_for_vep_annotated%>%select(-consequence_terms),
 
 ```{r zlotogora}
 
-zlotogora_variants<-xlsx::read.xlsx('./data/founder_variants_lists/zlotogora_ingd_202203.xls',sheetIndex = 1)
+#zlotogora_variants<-xlsx::read.xlsx('./data/founder_variants_lists/zlotogora_ingd_202203.xls',sheetIndex = 1)
+zlotogora_variants<-readr::read_delim('./data/founder_variants_lists/zlotogora_ignd_20240329.csv',delim='\t',comment='')
+colnames(zlotogora_variants)<-make.names(colnames(zlotogora_variants))
 # filter only founders
-zlotogora_founder_variants<-zlotogora_variants%>%filter(grepl('founde',X.No.of.chromosomes.families,ignore.case=T))%>%
-  mutate(variant=Mutation.c)%>%mutate(gene=trimws(Gene),variant=trimws(variant))
+zlotogora_founder_variants<-zlotogora_variants%>%
+  #filter(grepl('founde',X.No.of.chromosomes.families,ignore.case=T))%>% # add this if you want to take only the variants that are marked as founder
+  mutate(Mutation.c=stringr::str_replace_all(Mutation.c,'−','-'),
+         Mutation.c=stringr::str_replace_all(Mutation.c,'→','>'))%>%
+  mutate(variant=Mutation.c)%>%mutate(gene=trimws(Gene),variant=trimws(variant))%>%
+  mutate(gene=stringr::str_replace_all(gene,'\\s+',''))%>%
+  mutate(variant=stringr::str_replace_all(variant,'‐','-'))
 zlotogora_for_vep<-zlotogora_founder_variants%>%
-  left_join(refseq2gene%>%filter(!grepl('_',chrom))%>%distinct(),by=c('gene'='name2'))%>%
-  rename(transcript_name=X.name)%>%
-  filter(!is.na(transcript_name))%>%filter(!is.na(variant))%>%filter(grepl('^c.',variant))%>%
+  filter(!is.na(variant))%>%filter(grepl('^c.',variant))%>%
   mutate(variant=stringr::str_replace(variant,'\\;.+',''))%>%mutate(variant=stringr::str_replace_all(variant,'\\s+',''))%>%
-  mutate(hgvs_notation=glue('{transcript_name}:{variant}'))%>%distinct()
+  mutate(hgvs_notation=glue('{gene}:{variant}'))%>%distinct()
 
 zlotogora_for_vep_annotated<-NULL
 for (i in 1:nrow(zlotogora_for_vep)){
+#for (i in 3171:nrow(zlotogora_for_vep)){
+  message(glue('{i}/{nrow(zlotogora_for_vep)}'))
   variant<-zlotogora_for_vep%>%slice(i)
-  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation))
+  variant_position<-vep_cds_to_genomic_coordinates(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq = 'gene_symbol')
   annotated_variant<-variant%>%left_join(variant_position)
   zlotogora_for_vep_annotated<-zlotogora_for_vep_annotated%>%bind_rows(annotated_variant)
 }
 
+# validate variants
+validated_zlotogora_variants_with_annotation<-zlotogora_for_vep_annotated%>%filter(!is.na(chr))
+# remove duplicate genomic regions
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  distinct(gene,variant,Ethnic.group,locality,chr,start,end,.keep_all = TRUE)
+# if there is a location, validate it
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  mutate(annotation_location=glue('chr{chr}:{start}'))%>%
+  mutate(location_match=ifelse(location==annotation_location,1,0),
+         location_match=ifelse(is.na(location_match),0,location_match))%>%
+  group_by(gene,variant,Ethnic.group,locality)%>%
+  slice_max(location_match)%>%ungroup()
+# compare annotation hgvs with variant annotation
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  mutate(original_hgvs_cds=stringr::str_extract(variant,'c\\..+')%>%stringr::str_replace('del.+','del')%>%stringr::str_replace('dup.+','dup'),
+         annotation_hgvs_cds=stringr::str_extract(hgvsc,'c\\..+'))%>%
+  mutate(cds_start_match=ifelse(original_hgvs_cds==annotation_hgvs_cds,1,0),
+         cds_start_match=ifelse(is.na(cds_start_match),0,cds_start_match))%>%
+  group_by(gene,variant,Ethnic.group,locality)%>%
+  slice_max(cds_start_match)%>%ungroup()
+# compare annotation protein with variant annotation
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  mutate(annotation_protein=stringr::str_extract(hgvsp,'p\\..+'))%>%
+  mutate(protein_match=ifelse(Mutation..p.==annotation_protein,1,0),
+         protein_match=ifelse(is.na(protein_match),0,protein_match))%>%
+  group_by(gene,variant,Ethnic.group,locality)%>%
+  slice_max(protein_match)%>%ungroup()
 
-final_zlotogora_variants_with_annotation<-zlotogora_for_vep_annotated%>%filter(!is.na(seq_region_name))
-# add grch37 coordinates in order to validate the variants
-final_zlotogora_variants_with_annotation_and_grch37<-NULL
-for (i in 1:nrow(final_zlotogora_variants_with_annotation)){
-  var<-final_zlotogora_variants_with_annotation%>%slice(i)%>%
-      mutate(var_coords=glue('{seq_region_name}:{start}..{end}'))
-  converted_coords<-vep_convert_coordinates('GRCh38','GRCh37',coordinates = var%>%pull(var_coords))
-  var<-var%>%bind_cols(converted_coords)
-  final_zlotogora_variants_with_annotation_and_grch37<-final_zlotogora_variants_with_annotation_and_grch37%>%bind_rows(var)
-  message(glue('converted: {var%>%pull(var_coords)} : {var%>%pull(chr_GRCh37)}:{var%>%pull(start_GRCh37)}..{var%>%pull(end_GRCh37)}'))
-}
+# fix deletions
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  mutate(hgvs_del_ref=stringr::str_extract(hgvs_notation,'del.+'),
+         annotation_del_ref=glue('del{ref}'))%>%
+  mutate(del_match=ifelse(hgvs_del_ref==annotation_del_ref,1,0),
+         del_match=ifelse(is.na(del_match),0,del_match))%>%
+  group_by(gene,variant,Ethnic.group,locality)%>%
+  slice_max(del_match)%>%ungroup()
 
-# finally, where available, validate the coordinates in the location column (original zlotogora table) match the ones in the GRCh37 
-# if no location is available, keep the row
-final_zlotogora_variants_with_annotation_and_grch37<-final_zlotogora_variants_with_annotation_and_grch37%>%mutate(
-  match=location==glue('chr{chr_GRCh37}:{start_GRCh37}')
-)
+# fix duplications
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  mutate(hgvs_del_ref=stringr::str_extract(hgvs_notation,'dup.+'),
+         annotation_del_ref=glue('dup{alt}'))%>%
+  mutate(dup_match=ifelse(hgvs_del_ref==annotation_del_ref,1,0),
+         dup_match=ifelse(is.na(dup_match),0,dup_match))%>%
+  group_by(gene,variant,Ethnic.group,locality)%>%
+  slice_max(dup_match)%>%ungroup()
 
-final_zlotogora_variants_with_annotation_and_grch37_clean<-final_zlotogora_variants_with_annotation_and_grch37%>%
-  filter(is.na(match)|match)%>%
-  select(
-  population,Ethnic.group,Gene,hgvs_notation,
-  chr_GRCh38=seq_region_name,start_GRCh38=start,end_GRCh38=end,
-  chr_GRCh37,start_GRCh37,end_GRCh37,ref,alt
-)%>%
-  distinct(population,Ethnic.group,Gene,chr_GRCh38,start_GRCh38,end_GRCh38,.keep_all = T)
+# remove same pos variants
+validated_zlotogora_variants_with_annotation<-validated_zlotogora_variants_with_annotation%>%
+  distinct(gene,hgvs_notation,chr,start,end,ref,alt,Ethnic.group,locality,.keep_all = TRUE)
 
-write.table(final_zlotogora_variants_with_annotation_and_grch37_clean,
+remaining_duplicates<-validated_zlotogora_variants_with_annotation%>%
+  ungroup()%>%
+  filter(duplicated(validated_zlotogora_variants_with_annotation%>%
+                      select(hgvs_notation,population,Ethnic.group,locality)))%>%
+  select(hgvs_notation)%>%distinct()
+
+# remove ambiguous variants
+validated_zlotogora_variants_with_annotation<-
+  validated_zlotogora_variants_with_annotation%>%
+  filter(!(hgvs_notation %in% remaining_duplicates$hgvs_notation))
+
+write.table(validated_zlotogora_variants_with_annotation%>%
+              select(-c(consequence_terms)),
             file=glue('./output/founder_lists_with_genomic_coordinates/zlotogora_founder_variants_vep.{Sys.Date()}.csv'),
             sep='\t',
             row.names=F,
@@ -349,33 +391,84 @@ write.table(final_zlotogora_variants_with_annotation_and_grch37_clean,
 
 ```
 
-```{r add_grch37_coordinates}
-assemb_from<-'GRCh38'
-assemb_to<-'GRCh37'
+# generate final table
+```{r}
+# MOH
+moh_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep.2024-04-15.csv')
 
-input_files<-c(#'./output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep.2023-10-04.csv',
-               #'./output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.2023-10-04.csv',
-               './output/founder_lists_with_genomic_coordinates/onco51_panel_vep.2023-10-05.csv')
+moh_proc<-moh_raw%>%
+  mutate(source='moh',
+         chr=as.character(chr),
+         ethnicity=glue('{ethnicity}:{locality}'),
+         info=glue('{omim}:{disease}'))%>%
+  select(source,original_hgvsc=hgvs_notation,
+         hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,ethnicity,gene,hgvsp,assembly_name,info)
+moh_proc
+
+# myscreen
+myscreen_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.2024-04-15.csv')
+
+myscreen_proc<-myscreen_raw%>%
+  mutate(source='myscreen',
+         chr=as.character(chr),
+         ethnicity='.',
+         info='.')%>%
+  select(source,original_hgvsc=hgvs_notation,
+         hgvs_notation,hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,ethnicity,gene,hgvsp,assembly_name,info)
+myscreen_proc
+
+# onco51
+onco51_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/onco51_founder_variants_vep.2024-04-15.csv')
+
+onco51_proc<-onco51_raw%>%
+  mutate(source='onco51',
+         chr=as.character(chr),
+         ethnicity=glue('{sector}:{ethnicity}'),
+         info='.')%>%
+  select(source,original_hgvsc=hgvs_notation,
+         hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,ethnicity,gene,hgvsp,assembly_name,info)
+onco51_proc
+
+# zlotogora
+zlotogora_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/zlotogora_founder_variants_vep.2024-04-15.csv')
+
+# select whether to use only founders
+zlotogora_founders_raw<-zlotogora_raw%>%filter(grepl('found|fouder',X.No.of.chromosomes.families,ignore.case=T))
+
+zlotogora_proc<-zlotogora_founders_raw%>%
+  mutate(chr=as.character(chr),
+         source='imgd',
+         ethnicity=glue('{population}:{Ethnic.group}:{locality}'),
+         info=glue('{disease.MIM}:{disease};frequency={Carrier.frequency....}'))%>%
+  select(source,original_hgvsc=hgvs_notation,
+         hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,ethnicity,gene,hgvsp,assembly_name,info)
+zlotogora_proc
+
+zlotogora_for_franklin<-zlotogora_raw%>%
+  rename(cds_ref=ref,cds_alt=alt)%>%
+  mutate(ref=ifelse(strand==1,cds_ref,chartr('ACGT','TGCA',cds_ref)),
+         alt=ifelse(strand==1,cds_alt,chartr('ACGT','TGCA',cds_alt)))%>%
+  relocate(ref,alt,.after='end')
+# prep zlotogora table for franklin (to add links)
+write.table(zlotogora_for_franklin,            file=glue('./output/zlotogora_founder_variants_vep_for_franklin.{Sys.Date()}.csv'),
+            sep='\t',
+            row.names=F,
+            quote=F)
 
 
-for (input_file in input_files){
-  message(glue('Annotating {input_file}'))
-  input_vars<-readr::read_delim(input_file,delim='\t',na = 'NA')
-  output_vars<-NULL
-  for (i in 1:nrow(input_vars)){
-    var<-input_vars%>%slice(i)%>%
-      mutate(var_coords=glue('{chr}:{start}..{end}'))
-    if (!is.na(var%>%pull(start))){
-      message(glue('converting {var%>%pull(var_coords)}'))
-      converted_coords<-vep_convert_coordinates(assemb_from,assemb_to,coordinates = var%>%pull(var_coords))
-      var<-var%>%bind_cols(converted_coords)
-    }
-    output_vars<-output_vars%>%bind_rows(var)
-  }
-  output_file_name<-glue("{stringr::str_replace(basename(input_file),'.csv','')}.with{assemb_to}.csv")
-  write.table(output_vars,file=glue('./output/founder_lists_with_genomic_coordinates/{output_file_name}'),row.names = F,sep='\t')
-}
+final_founder_table<-
+  bind_rows(moh_proc,onco51_proc,myscreen_proc,zlotogora_proc)%>%
+  filter(!is.na(chr))%>%
+  mutate(ref=ifelse(strand==1,cds_ref,chartr('ACGT','TGCA',cds_ref)),
+         alt=ifelse(strand==1,cds_alt,chartr('ACGT','TGCA',cds_alt)))%>%
+  relocate(ref,alt,.after='end')
+write.table(final_founder_table,file=glue('./output/combined_founder_variants_table.{Sys.Date()}.csv'),row.names = F,quote = F,sep='\t')
+
+# fix prob vars
+fixed_vars<-final_founder_table%>%slice(c(973,1256, 1257, 1258, 2013, 2073, 2141, 2325, 2326)-1)
+write.table(fixed_vars,file=glue('./output/combined_founder_variants_table.missing_vars.{Sys.Date()}.csv'),row.names = F,quote = F,sep='\t')
 ```
+
 
 # clinvar
 ```{r oncopanel}
