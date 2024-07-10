@@ -46,7 +46,7 @@ vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic
   # if the variant is an insertion and the error suggests ambiguity, try changing it to dup
   if (('error' %in% colnames(variant_position)) && grepl('(I|i)ns',variant$variant)){
       original_hgvs_notation<-variant$hgvs_notation
-      variant$hgvs_notation<-stringr::str_replace(variant$hgvs_notation,'(I|i)ns.+','dup')
+      variant$hgvs_notation<-stringr::str_replace(variant$hgvs_notation,'(I|i)ns','dup')
       message(glue('VEP: parsing failed, will retry with {variant$hgvs_notation} instead of {original_hgvs_notation}'))
       variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
   }
@@ -157,10 +157,18 @@ vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,d
   # keep only valid chromosomes
   res<-res%>%
     mutate(valid_chr=ifelse(grepl('HG|HS',chr),0,1))%>%
-    group_by(start,end,ref,alt)%>%
-    slice_max(valid_chr)%>%ungroup()%>%
+    slice_max(valid_chr)%>%
     select(-valid_chr)
-  
+  # compare the hgvs notation for ins/del/dup (which result in ambiguity) if they are given in the hgvs_notation make sure they match the ref alt
+  if (max(nchar(res$ref))<500 & max(nchar(res$alt))<500 & grepl('ins|dup|del',unique(res$hgvs_notation))){
+    res<-res%>%
+      rowwise()%>%
+      mutate(is_matching_del=ifelse(grepl(glue('del{ref}'),hgvs_notation),1,0),
+             is_matching_ins=ifelse(grepl(glue('ins{alt}'),hgvs_notation),1,0),
+             is_matching_dup=ifelse(grepl(glue('dup{alt}'),hgvs_notation),1,0))%>%
+      ungroup()%>%
+      slice_max(is_matching_del+is_matching_ins+is_matching_dup)
+  } 
   # cleanup
   unnecessary_cols<-c('distance','polyphen_score','sift_score','polyphen_prediction','sift_prediction','cds_end','cds_start','flags','hgvs_offset','bam_edit','refseq_offset')
   for (uc in unnecessary_cols){

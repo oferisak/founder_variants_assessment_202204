@@ -404,6 +404,7 @@ moh_ws<-
   mutate(variant_id=row_number(),
          original_hgvs_notation=glue('{gene}:{variant}'))
 
+# Fix the input variant list (if variants are written incorrectly)
 moh_ws_fixed<-
   moh_ws%>%
   mutate(variant=ifelse(variant=='c.415(-1)G>A','c.415-1G>A',variant))%>%
@@ -454,16 +455,27 @@ for (i in 1:nrow(moh_ws_fixed)){
   moh_ws_vep_annotated<-moh_ws_vep_annotated%>%bind_rows(annotated_variant)
 }
 
-validated_moh_ws_vep_annotated<-moh_ws_vep_annotated
-# keep only valid chromosomes
-validated_moh_ws_vep_annotated<-validated_moh_ws_vep_annotated%>%
-  mutate(valid_chr=ifelse(grepl('^[1-9XY]',chr),1,0))%>%
-  group_by(variant_id)%>%
-  slice_max(valid_chr)%>%ungroup()
-# remove same pos variants
-# validated_moh_ws_vep_annotated<-validated_moh_ws_vep_annotated%>%
-#   distinct(hgvs_notation,chr,start,end,ref,alt,.keep_all = TRUE)
+# grab all ambiguous variants
+ambiguous_variant_ids<-moh_ws_vep_annotated%>%filter(duplicated(variant_id))%>%pull(variant_id)%>%unique()
 
+moh_ambiguous_table<-
+  moh_ws_vep_annotated%>%
+  filter(variant_id%in%ambiguous_variant_ids)
+
+xlsx::write.xlsx2(moh_ambiguous_table%>%
+                    select(original_hgvs_notation,
+                           original_transcript=transcript,
+                           hgvs_notation,
+                           transcript_id,
+                           chr,start,end,ref,alt,
+                           hgvsp)%>%
+                    as.data.frame(),
+                  file=glue('./output/moh_ambiguous_variants.{Sys.Date()}.xlsx'),
+                  sheetName = 'ambiguous_variants',
+                  row.names = F)
+
+
+validated_moh_ws_vep_annotated<-moh_ws_vep_annotated
 # compare with full founders list
 full_founders_list<-readr::read_delim('./output/combined_founder_variants_table.2024-04-25.csv')
 full_founders_list<-full_founders_list%>%
@@ -498,27 +510,7 @@ variants_in_moh_not_in_full_founders<-validated_moh_ws_vep_annotated%>%
 found_variant_ids<-variants_in_moh_not_in_full_founders%>%filter(!is.na(gene.y))%>%pull(variant_id)%>%unique()
 variants_in_moh_not_in_full_founders<-variants_in_moh_not_in_full_founders%>%filter(is.na(gene.y),!(variant_id%in%found_variant_ids))
 
-full_founders_list%>%filter(grepl('NM_000642',hgvsc))
 
-# grab all ambiguous variants
-ambiguous_variant_ids<-validated_moh_ws_vep_annotated%>%filter(duplicated(variant_id))%>%pull(variant_id)%>%unique()
-
-moh_ambiguous_table<-moh_ws%>%
-  select(variant_id,original_hgvs_notation)%>%
-  left_join(validated_moh_ws_vep_annotated,by='variant_id')%>%
-  filter(variant_id%in%ambiguous_variant_ids)
-
-xlsx::write.xlsx2(moh_ambiguous_table%>%
-                    select(original_hgvs_notation,
-                           original_transcript=transcript,
-                           hgvs_notation,
-                           transcript_id,
-                           chr,start,end,ref,alt,
-                           hgvsp)%>%
-                    as.data.frame(),
-                  file=glue('./output/moh_ambiguous_variants.{Sys.Date()}.xlsx'),
-                  sheetName = 'ambiguous_variants',
-                  row.names = F)
   
 ```
 
