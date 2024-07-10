@@ -34,14 +34,33 @@ find_bad_request<-function(hgvs_notations){
   }
 }
 
-vep_cds_to_genomic_coordinates<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq){
+vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic_effect=TRUE){
+  gene_symbol_or_refseq<-ifelse(!is.na(variant$transcript) & variant$transcript!='','refseq','gene_symbol')
+  variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
+  # if the transcript is not found, and there is a gene symbol, try using it instead
+  if (('error' %in% colnames(variant_position)) && grepl('Could not get a Transcript object',variant_position$error) && variant$gene!=''){
+    variant$hgvs_notation<-glue('{variant$gene}:{variant$variant}')
+    gene_symbol_or_refseq<-'gene_symbol'
+    variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq)
+  }
+  # if the variant is an insertion and the error suggests ambiguity, try changing it to dup
+  if (('error' %in% colnames(variant_position)) && grepl('(I|i)ns',variant$variant)){
+      original_hgvs_notation<-variant$hgvs_notation
+      variant$hgvs_notation<-stringr::str_replace(variant$hgvs_notation,'(I|i)ns.+','dup')
+      message(glue('VEP: parsing failed, will retry with {variant$hgvs_notation} instead of {original_hgvs_notation}'))
+      variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
+  }
+  return(variant_position)
+}
+
+vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,distinct_genomic_effect=TRUE){
   if (build=='grch37'){
     server <- "https://grch37.rest.ensembl.org"
   }else{
     server<-"https://rest.ensembl.org"
   }
+  message(glue('VEP: Parsing {hgvs_notation} in build {build} using {gene_symbol_or_refseq}'))
   vep_hgvs_ext <- "/vep/human/hgvs/:hgvs_notation"
-  message(glue('Parsing {hgvs_notation} with build {build}'))
   if (gene_symbol_or_refseq=='refseq'){
     ext <- glue("/vep/human/hgvs/{hgvs_notation}?refseq=true&canonical=true&ambiguous_hgvs=1&hgvs=1&pick_order=mane_plus_clinical")
   }else{
@@ -50,6 +69,7 @@ vep_cds_to_genomic_coordinates<-function(hgvs_notation,build='grch37',gene_symbo
   
   r <- tryCatch(GET(paste(server, ext, sep = ""), content_type("application/json")),
                 error=function(e){as.character(glue('parsing error: {e}'))})
+  # if the response is an error handle it
   if (class(r)!='response'){
     message(glue('VEP parsing error: {r}'))
     res<-data.frame(hgvs_notation=hgvs_notation,error=r)
@@ -70,6 +90,7 @@ vep_cds_to_genomic_coordinates<-function(hgvs_notation,build='grch37',gene_symbo
   if (gene_symbol_or_refseq=='gene_symbol'){
     
     input_gene_symbol<-stringr::str_replace(hgvs_notation,':.+','')
+    # make sure you keep only the transcript cons related to the gene symbol used in the query
     transcript_cons<-transcript_cons%>%filter(gene_symbol==input_gene_symbol)
   }
   if (gene_symbol_or_refseq=='refseq'){
@@ -79,12 +100,20 @@ vep_cds_to_genomic_coordinates<-function(hgvs_notation,build='grch37',gene_symbo
       return(data.frame(hgvs_notation=hgvs_notation,error='Could not find the given transcript in the transcripts output by VEP'))
     }
   }
+  # join the transcript cons with the original res
   res<-res%>%
     select(original_res_num,hgvs_notation=input,chr=seq_region_name,start,end,allele_string,strand,assembly_name)%>%
     separate(allele_string,into=c('ref','alt'),sep='/')%>%
     left_join(transcript_cons%>%
-                select(-c(gene_symbol_source,biotype,gene_id,impact,strand,variant_allele)))%>%select(-original_res_num)%>%
+                select(-c(gene_symbol_source,biotype,gene_id,impact,strand,variant_allele)))%>%
+    select(-original_res_num)%>%
     distinct()
+  # fix cannonical
+  if ('canonical'%in%colnames(res)){
+    res$is_canonical<-ifelse(is.na(res$canonical),0,1)
+  }else{
+    res$is_canonical<-0
+  }
   # match cds start
   if ('hgvsc' %in% colnames(res)){
     res<-res%>%
@@ -93,15 +122,52 @@ vep_cds_to_genomic_coordinates<-function(hgvs_notation,build='grch37',gene_symbo
       mutate(cds_start_match=ifelse(original_cds_start==annotation_cds_start,1,0),
              cds_start_match=ifelse(is.na(cds_start_match),0,cds_start_match))%>%
       slice_max(cds_start_match)
+    # collect most common cds and protein changes
+    res<-res%>%mutate(cds_change=stringr::str_replace(hgvsc,'[^:]+:',''))
+    res<-res%>%left_join(
+      res%>%count(cds_change)%>%rename(cds_count=n)
+    )%>%mutate(is_most_common_cds_change=ifelse(cds_count==max(cds_count),1,0))
   }else{
     res<-res%>%
-      distinct(chr,start,end,.keep_all = TRUE)
+      mutate(is_most_common_cds_change=0)%>%
+      distinct(chr,start,end,ref,alt,.keep_all = TRUE)
+  }
+  if ('hgvsp' %in% colnames(res)){
+    res<-res%>%mutate(protein_change=stringr::str_replace(hgvsp,'[^:]+:',''))
+    res<-res%>%left_join(
+      res%>%count(protein_change)%>%rename(protein_count=n)
+    )%>%
+      mutate(is_most_common_protein_change=ifelse(protein_count==max(protein_count),1,0))
+  }else{
+    res$is_most_common_protein_change=0
   }
   # add genomic ref alt
   res<-res%>%mutate(
     genomic_ref=ifelse(strand==1,ref,chartr('ACGT','TGCA',ref)),
     genomic_alt=ifelse(strand==1,alt,chartr('ACGT','TGCA',alt))
   )
+  # for results with the same chromosomal location select the ones that are most common cds change > most common protein change > is canonical
+  if (distinct_genomic_effect){
+    res <- res %>%
+      group_by(chr, start, end, ref, alt) %>%
+      arrange(desc(is_most_common_cds_change), desc(is_most_common_protein_change),desc(is_canonical)) %>%
+      slice(1) %>%
+      ungroup()
+  }
+  # keep only valid chromosomes
+  res<-res%>%
+    mutate(valid_chr=ifelse(grepl('HG|HS',chr),0,1))%>%
+    group_by(start,end,ref,alt)%>%
+    slice_max(valid_chr)%>%ungroup()%>%
+    select(-valid_chr)
+  
+  # cleanup
+  unnecessary_cols<-c('distance','polyphen_score','sift_score','polyphen_prediction','sift_prediction','cds_end','cds_start','flags','hgvs_offset','bam_edit','refseq_offset')
+  for (uc in unnecessary_cols){
+    if (uc %in% colnames(res)){
+      res<-res%>%select(-all_of(uc))
+    }
+  }
   message(glue('VEP: found {nrow(res)} matching variants'))
   return(res)
 }
