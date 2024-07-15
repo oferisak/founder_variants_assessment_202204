@@ -33,25 +33,76 @@ find_bad_request<-function(hgvs_notations){
     
   }
 }
+gene_synonyms<-readr::read_delim('/media/SSD/Bioinformatics/Databases/ncbi/Homo_sapiens.gene_info')%>%
+  as.data.frame()%>%
+  select(Symbol,Synonyms)%>%
+  filter(!duplicated(Symbol))
+# full_gene_synonyms<-gene_synonyms
+# full_gene_synonyms<-full_gene_synonyms%>%
+#   bind_rows(
+#     gene_synonyms%>%
+#     mutate(syns=Synonyms)%>%
+#     separate_rows(Synonyms,sep='\\|')%>%
+#     mutate(syns=stringr::str_replace(syns,glue('{Synonyms}\\|*'),''))%>%
+#     select(-Symbol)%>%
+#     rename(Symbol=Synonyms,Synonyms=syns)  
+#   )%>%
+#   filter(!duplicated(Symbol))
 
 vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic_effect=TRUE){
   gene_symbol_or_refseq<-ifelse(!is.na(variant$transcript) & variant$transcript!='','refseq','gene_symbol')
   variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
+  # if the transcript is not found, perhaps the transcript is too old, try a newer version
+  if (('error' %in% colnames(variant_position)) &&
+      grepl('Could not get a Transcript object',variant_position$error) &&
+      grepl('NM_',variant$transcript)){
+    original_transcript<-variant$transcript
+    transcript_isoform<-as.numeric(stringr::str_replace(original_transcript,'[^\\.]+\\.',''))
+    if (!is.na(transcript_isoform)){ # in case the transcript is provided without an isoform
+      for (i in (transcript_isoform+1):(transcript_isoform+2)){
+        transcript_without_isoform<-stringr::str_replace(original_transcript,"\\..+","")
+        newer_isoform<-glue('{transcript_without_isoform}.{i}')
+        message(glue('VEP: Could not find transcript {original_transcript}, trying with {newer_isoform}'))
+        variant$hgvs_notation<-glue('{newer_isoform}:{variant$variant}')
+        variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq)
+        if (!('error' %in% colnames(variant_position))){
+          break
+        }
+      }
+    }else{message(glue('VEP: transcript provided without an isoform {original_transcript}, will look for gene.'))}
+  }
   # if the transcript is not found, and there is a gene symbol, try using it instead
-  if (('error' %in% colnames(variant_position)) && grepl('Could not get a Transcript object',variant_position$error) && variant$gene!=''){
+  if (('error' %in% colnames(variant_position)) && gene_symbol_or_refseq=='refseq' && grepl('Could not get a Transcript object',variant_position$error) && (variant$gene!='' & !is.na(variant$gene))){
     variant$hgvs_notation<-glue('{variant$gene}:{variant$variant}')
     gene_symbol_or_refseq<-'gene_symbol'
     variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq)
   }
+  
   # if the variant is an insertion and the error suggests ambiguity, try changing it to dup
-  if (('error' %in% colnames(variant_position)) && grepl('(I|i)ns',variant$variant)){
+  if (('error' %in% colnames(variant_position)) &&(!grepl('transcript consequences',variant_position$error)) && grepl('(I|i)ns',variant$variant)){
       original_hgvs_notation<-variant$hgvs_notation
       variant$hgvs_notation<-stringr::str_replace(variant$hgvs_notation,'(I|i)ns','dup')
       message(glue('VEP: parsing failed, will retry with {variant$hgvs_notation} instead of {original_hgvs_notation}'))
       variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
   }
+  # if a gene symbol is not found, try other synonyms of the gene
+  if (('error' %in% colnames(variant_position)) && 
+      gene_symbol_or_refseq=='gene_symbol' && 
+      grepl('Could not get a Transcript object',variant_position$error)){
+    gene_syn<-gene_synonyms%>%filter(Symbol==variant$gene)
+    for (gene_synonym in gene_syn$Synonyms%>%stringr::str_split('\\|')%>%unlist()){
+      message(glue('VEP: Could not find gene_symbol {variant$gene}, trying with {gene_synonym}'))
+      variant$hgvs_notation<-glue('{gene_synonym}:{variant$variant}')
+      variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq='gene_symbol')
+      if (!('error' %in% colnames(variant_position))){
+        break
+      }
+    }
+  }
   return(variant_position)
 }
+
+
 
 vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,distinct_genomic_effect=TRUE){
   if (build=='grch37'){
@@ -81,6 +132,12 @@ vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,d
   if ('error' %in% names(res)){
     res<-data.frame(hgvs_notation=hgvs_notation,error=res$error)
     message(glue('VEP: {res$error}'))
+    return(res)
+  }
+  if (!('transcript_consequences' %in% colnames(res))){
+    error<-'Could not identify any transcript consequences for the given hgvs notation'
+    res<-data.frame(hgvs_notation=hgvs_notation,error=error)
+    message(glue('VEP: {error}'))
     return(res)
   }
   transcript_cons<-bind_rows(res$transcript_consequences)#%>%distinct()
@@ -160,7 +217,7 @@ vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,d
     slice_max(valid_chr)%>%
     select(-valid_chr)
   # compare the hgvs notation for ins/del/dup (which result in ambiguity) if they are given in the hgvs_notation make sure they match the ref alt
-  if (max(nchar(res$ref))<500 & max(nchar(res$alt))<500 & grepl('ins|dup|del',unique(res$hgvs_notation))){
+  if (max(nchar(res$ref))<2000 & max(nchar(res$alt))<2000 & grepl('ins|dup|del',unique(res$hgvs_notation))){
     res<-res%>%
       rowwise()%>%
       mutate(is_matching_del=ifelse(grepl(glue('del{ref}'),hgvs_notation),1,0),
@@ -170,7 +227,7 @@ vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,d
       slice_max(is_matching_del+is_matching_ins+is_matching_dup)
   } 
   # cleanup
-  unnecessary_cols<-c('distance','polyphen_score','sift_score','polyphen_prediction','sift_prediction','cds_end','cds_start','flags','hgvs_offset','bam_edit','refseq_offset')
+  unnecessary_cols<-c('distance','polyphen_score','sift_score','polyphen_prediction','sift_prediction','cds_end','cds_start','flags','hgvs_offset','bam_edit','refseq_offset','consequence_terms')
   for (uc in unnecessary_cols){
     if (uc %in% colnames(res)){
       res<-res%>%select(-all_of(uc))
