@@ -297,8 +297,8 @@ write.table(validated_zlotogora_variants_with_annotation,
 # Wide screen MOH
 
 ```{r moh_wide_screen}
-moh_ws<-xlsx::read.xlsx2('./data/founder_variants_lists/moh/moh_07_07_24.xlsx',
-                         sheetIndex = 1)
+moh_ws<-xlsx::read.xlsx2('./data/founder_variants_lists/moh/moh_07_07_24.xlsx',sheetIndex = 1)
+
 # moh_ws$X.<-NULL
 # colnames(moh_ws)<-c('disease_id','disease_name','omim','gene','omim_id','transcript','variant','ethnicity')
 moh_ws<-
@@ -357,17 +357,77 @@ for (i in 1:nrow(moh_ws_fixed)){
 #for (i in 1:20){
   message(glue('{i}/{nrow(moh_ws_fixed)}'))
   variant<-moh_ws_fixed%>%slice(i)
-  variant_position<-vep_cds_to_genomic_coordinates(variant,build='grch37',distinct_genomic_effect=TRUE)
-  annotated_variant<-variant%>%left_join(variant_position,by=c('hgvs_notation'='hgvs_notation'))
+  variant_position<-vep_cds_to_genomic_coordinates(variant,build='grch37',distinct_genomic_effect=TRUE,validate_by_cds = TRUE)
+  annotated_variant<-variant%>%select(-hgvs_notation)%>%bind_cols(variant_position)
   moh_ws_vep_annotated<-moh_ws_vep_annotated%>%bind_rows(annotated_variant)
 }
+moh_ws_vep_annotated<-moh_ws_vep_annotated%>%mutate(error=stringr::str_replace_all(error,'\n',' '))
+
+# failed variants
+moh_ws_failed<-moh_ws_vep_annotated%>%filter(is.na(chr))
+
+# validate by transcript (without isoform)
+validated_moh_ws_vep_annotated<-moh_ws_vep_annotated%>%
+  mutate(transcript_no_isoform_match=ifelse(transcript==transcript_id_no_isoform,1,0))%>%
+  group_by(variant_id)%>%
+  slice_max(transcript_no_isoform_match)%>%ungroup()
 
 # grab all ambiguous variants
-ambiguous_variant_ids<-moh_ws_vep_annotated%>%filter(duplicated(variant_id))%>%pull(variant_id)%>%unique()
-moh_ws_vep_annotated$is_ambiguous<-ifelse(moh_ws_vep_annotated$variant_id%in%ambiguous_variant_ids,1,0)
+ambiguous_variant_ids<-validated_moh_ws_vep_annotated%>%filter(duplicated(variant_id))%>%pull(variant_id)%>%unique()
+validated_moh_ws_vep_annotated$is_ambiguous<-ifelse(validated_moh_ws_vep_annotated$variant_id%in%ambiguous_variant_ids,1,0)
 
-write.table(moh_ws_vep_annotated,
+moh_ws_ambiguous<-validated_moh_ws_vep_annotated%>%filter(variant_id%in%ambiguous_variant_ids)
+
+write.table(validated_moh_ws_vep_annotated,
             file=glue('./output/founder_lists_with_genomic_coordinates/moh_ws_vep.{Sys.Date()}.csv'),
+            sep='\t',
+            row.names=F,
+            quote=F)
+```
+
+# Soroka - beduin
+
+```{r soroka}
+soroka<-readr::read_delim('./data/founder_variants_lists/soroka/beduin_panel_myscreen_2.3.csv',delim='\t')
+soroka<-
+  soroka%>%mutate(across(everything(), ~ stringr::str_trim(.)))%>%
+  #separate_rows(variant,sep = '/')%>%
+  mutate(variant_id=row_number(),
+         variant = ` cDNA pDNA`,
+         transcript=Transcript,
+         hgvs_notation=gdna,
+         original_hgvs_notation=gdna)
+
+soroka_vep_annotated<-NULL
+for (i in 1:nrow(soroka)){
+#for (i in 1:20){
+  message(glue('{i}/{nrow(soroka)}'))
+  variant<-soroka%>%slice(i)
+  variant_position<-vep_cds_to_genomic_coordinates(variant,build='grch37',distinct_genomic_effect=FALSE)
+  annotated_variant<-variant%>%select(-hgvs_notation)%>%bind_cols(variant_position)
+  soroka_vep_annotated<-soroka_vep_annotated%>%bind_rows(annotated_variant)
+}
+
+validated_soroka_vep<-soroka_vep_annotated%>%
+  mutate(original_transcript_no_isoform=stringr::str_replace(transcript,'\\..+',''))%>%
+  mutate(transcript_no_isoform_match=ifelse((is.na(original_transcript_no_isoform)|
+                                               original_transcript_no_isoform==transcript_id_no_isoform),1,0))%>%
+  group_by(variant_id)%>%
+  slice_max(transcript_no_isoform_match)%>%ungroup()
+
+# failed
+soroka_failed<-soroka_vep_annotated%>%filter(is.na(chr))
+
+# ambiguous
+soroka_ambiguous_ids<-validated_soroka_vep%>%filter(duplicated(variant_id))%>%pull(variant_id)%>%unique()
+soroka_ambiguous<-validated_soroka_vep%>%filter(variant_id %in% soroka_ambiguous_ids)
+validated_soroka_vep<-validated_soroka_vep%>%mutate(is_ambiguous=ifelse(variant_id%in%soroka_ambiguous_ids,1,0))
+# Replace all \n with space in the dataframe
+validated_soroka_vep <- data.frame(lapply(validated_soroka_vep, function(x) {
+  if (is.character(x)) {gsub("\n", " ", x)}else {x}
+}))
+write.table(validated_soroka_vep,
+            file=glue('./output/founder_lists_with_genomic_coordinates/soroka_vep.{Sys.Date()}.csv'),
             sep='\t',
             row.names=F,
             quote=F)
@@ -377,9 +437,11 @@ write.table(moh_ws_vep_annotated,
 # Analyze MOH ws
 
 ```{r analyze_moh_ws}
-moh_ws_ambiguous_table<-
-  moh_ws_vep_annotated%>%
-  filter(variant_id%in%ambiguous_variant_ids)
+original_moh_ws_file<-xlsx::read.xlsx2('./data/founder_variants_lists/moh/moh_07_07_24.xlsx',
+                         sheetIndex = 1)
+
+
+moh_ws_vep_annotated<-readr::read_delim('./output/founder_lists_with_genomic_coordinates/moh_ws_vep.2024-07-16.csv',delim = '\t')
 
 # compare with full founders list
 cols_for_comp<-c('original_hgvs_notation','chr','start','end','genomic_ref','genomic_alt','gene_hgvs','transcript_hgvs','is_ambiguous','source')
@@ -390,38 +452,69 @@ moh_ws_for_merge<-moh_ws_vep_annotated%>%
          transcript_hgvs=glue('{transcript}:{cds_change}'),
          source='moh_ws')%>%
   select(all_of(cols_for_comp))
-founders_for_merge<-readr::read_delim('./output/combined_founder_variants_table.2024-07-12.csv')%>%
+
+founders_for_merge<-readr::read_delim('./output/combined_founder_variants_table.2024-07-17.csv')%>%
   mutate(original_hgvs_notation=original_hgvsc,
          cds_change=stringr::str_extract(hgvsc,'c\\..+'),
          transcript=stringr::str_replace(hgvsc,':.+',''),
          gene_hgvs=glue('{gene_symbol}:{cds_change}'),
          transcript_hgvs=glue('{transcript}:{cds_change}'))%>%
-  select(all_of(cols_for_comp))
+  select(all_of(cols_for_comp))%>%distinct()
 
 # comparison by location
 moh_ws_for_merge<-moh_ws_for_merge%>%
   left_join(founders_for_merge%>%
               mutate(location_found=1)%>%
-              distinct(chr,start,end,genomic_ref,genomic_alt,location_found,is_ambiguous))%>%
+              select(chr,start,end,genomic_ref,genomic_alt,location_found,is_ambiguous)%>%
+              distinct(chr,start,end,genomic_ref,genomic_alt,location_found,.keep_all = T))%>%
   mutate(location_found=ifelse(is.na(location_found),0,1))
 
 founders_for_merge<-founders_for_merge%>%
   left_join(moh_ws_for_merge%>%
               mutate(location_found=1)%>%
-              distinct(chr,start,end,genomic_ref,genomic_alt,location_found,is_ambiguous))%>%
+              select(chr,start,end,genomic_ref,genomic_alt,location_found,is_ambiguous)%>%
+              distinct(chr,start,end,genomic_ref,genomic_alt,location_found,.keep_all = T))%>%
   mutate(location_found=ifelse(is.na(location_found),0,1))
 
 # comparison by transcript
 moh_ws_for_merge<-moh_ws_for_merge%>%
-  mutate(transcript_found=ifelse((transcript_hgvs%in%founders_for_merge$transcript_hgvs)|
+  mutate(transcript_found=ifelse((transcript_hgvs!='NA:NA') & (transcript_hgvs%in%founders_for_merge$transcript_hgvs)|
                                        (gene_hgvs%in%founders_for_merge$gene_hgvs),1,0))%>%
-  mutate(location_or_transcript_found=location_found+transcript_found)
+  mutate(location_or_transcript_found=location_found+transcript_found)%>%
+  mutate(comp_with_founder = ifelse(
+                is.na(chr),
+                'not_parsed',
+                ifelse(
+                  location_or_transcript_found > 0,
+                  'present_in_founder_lists',
+                  'not_present_in_founder_lists'
+                )))
 
 founders_for_merge<-founders_for_merge%>%
   mutate(transcript_found=ifelse((transcript_hgvs%in%moh_ws_for_merge$transcript_hgvs)|
                                        (gene_hgvs%in%moh_ws_for_merge$gene_hgvs),1,0))%>%
   mutate(location_or_transcript_found=location_found+transcript_found)
 
+# annotate the original moh_ws list
+moh_comp_output <- moh_ws_vep_annotated %>%
+  left_join(moh_ws_for_merge %>%
+              select(original_hgvs_notation,chr,start,end,comp_with_founder))%>%
+  mutate(modified_given_hgvs=ifelse(hgvs_notation!=original_hgvs_notation,1,0))%>%
+  select(variant_id,colnames(original_moh_ws_file),original_hgvs_notation,
+         submitted_hgvs_notation=hgvs_notation,
+         chr,start,end,ref,alt,
+         hgvsc,hgvsp,is_ambiguous,modified_given_hgvs,comp_with_founder)
+# num of ambiguous
+moh_comp_output%>%distinct(variant_id,.keep_all = T)%>%count(is_ambiguous)
+# non ambiguous
+moh_comp_output%>%distinct(variant_id,.keep_all = T)%>%count(comp_with_founder)
+
+xlsx::write.xlsx2(moh_comp_output%>%as.data.frame(),
+                  file=glue('./output/moh_ws_annotated.{Sys.Date()}.xlsx'),
+                  sheetName = 'annotated_variants',
+                  row.names = F)
+
+# merged list MOH and our founder list
 merged_list<-moh_ws_for_merge%>%bind_rows(founders_for_merge)
 merged_list<-merged_list%>%
   mutate(comparison=case_when(
@@ -457,13 +550,18 @@ xlsx::write.xlsx2(merged_list%>%
 ```{r}
 # Raw tables
 ## MOH (old screen)
-moh_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/preconception_screening_moh_vep.2024-07-10.csv')
+founder_variants_lists_folder<-'/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates'
+moh_raw<-readr::read_delim(glue('{founder_variants_lists_folder}/preconception_screening_moh_vep.2024-07-10.csv'))
 ## myscreen
-myscreen_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/preconception_screening_myscreen_vep.2024-07-10.csv')
+myscreen_raw<-readr::read_delim(glue('{founder_variants_lists_folder}/preconception_screening_myscreen_vep.2024-07-10.csv'))
 ## onco51
-onco51_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/onco51_founder_variants_vep.2024-07-10.csv')
+onco51_raw<-readr::read_delim(glue('{founder_variants_lists_folder}/onco51_founder_variants_vep.2024-07-10.csv'))
 ## zlotogora
-zlotogora_raw<-readr::read_delim('/media/SSD/Bioinformatics/Projects/founder_variants_assessment_202204/output/founder_lists_with_genomic_coordinates/zlotogora_founder_variants_vep.2024-07-11.csv')
+zlotogora_raw<-readr::read_delim(glue('{founder_variants_lists_folder}/zlotogora_founder_variants_vep.2024-07-11.csv'))
+## soroka
+soroka_raw<-readr::read_delim(glue('{founder_variants_lists_folder}/soroka_vep.2024-07-17.csv'),delim='\t')
+## moh wide screen
+moh_ws_raw<-readr::read_delim(glue('{founder_variants_lists_folder}/moh_ws_vep.2024-07-16.csv'))
 
 moh_proc<-moh_raw%>%
   mutate(source='moh',
@@ -471,7 +569,7 @@ moh_proc<-moh_raw%>%
          ethnicity=glue('{ethnicity}:{locality}'),
          info=glue('{omim}:{disease}'))%>%
   select(source,original_hgvsc=hgvs_notation,
-         hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,is_ambiguous,error)
+         hgvsc,cds_ref=ref,cds_alt=alt,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,is_ambiguous,error)
 moh_proc
 
 myscreen_proc<-myscreen_raw%>%
@@ -480,7 +578,7 @@ myscreen_proc<-myscreen_raw%>%
          ethnicity='.',
          info='.')%>%
   select(source,original_hgvsc=hgvs_notation,
-         hgvs_notation,hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,error)
+         hgvs_notation,hgvsc,cds_ref=ref,cds_alt=alt,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,error)
 myscreen_proc
 
 onco51_proc<-onco51_raw%>%
@@ -489,9 +587,8 @@ onco51_proc<-onco51_raw%>%
          ethnicity=glue('{sector}:{ethnicity}'),
          info='.')%>%
   select(source,original_hgvsc=hgvs_notation,
-         hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,error)
+         hgvsc,cds_ref=ref,cds_alt=alt,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,error)
 onco51_proc
-
 
 # select whether to use only founders
 zlotogora_founders_raw<-zlotogora_raw%>%filter(grepl('found|fouder',X.No.of.chromosomes.families,ignore.case=T))
@@ -502,17 +599,42 @@ zlotogora_proc<-zlotogora_founders_raw%>%
          ethnicity=glue('{population}:{Ethnic.group}:{locality}'),
          info=glue('{disease.MIM}:{disease};frequency={Carrier.frequency....}'))%>%
   select(source,original_hgvsc=hgvs_notation,
-         hgvsc,cds_ref=ref,cds_alt=alt,strand,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,is_ambiguous,error)
+         hgvsc,cds_ref=ref,cds_alt=alt,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,is_ambiguous,error)
 zlotogora_proc
 
+soroka_proc<-soroka_raw%>%
+  mutate(chr=as.character(chr),
+         source='soroka_beduin',
+         ethnicity='soroka_beduin',
+         info=stringr::str_replace_all(soroka_raw$Disease,'\n',''))%>%
+  select(source,original_hgvsc=hgvs_notation,
+         hgvsc,cds_ref=ref,cds_alt=alt,chr,start,end,genomic_ref,genomic_alt,ethnicity,gene_symbol,transcript,hgvsp,assembly_name,info,is_ambiguous,error)
+
+moh_ws_proc<-moh_ws_raw%>%
+  mutate(chr=as.character(chr),
+         source='moh_unified_screen',
+         ethnicity='.',
+         info=stringr::str_replace_all(condition_name,'\n',''))
+
 final_founder_table<-
-  bind_rows(moh_proc,onco51_proc,myscreen_proc,zlotogora_proc)%>%
+  bind_rows(moh_proc,onco51_proc,myscreen_proc,zlotogora_proc,soroka_proc,moh_ws_proc)%>%
   filter(!is.na(chr))%>%
   filter(is.na(error))%>%
   filter(is.na(is_ambiguous)|is_ambiguous!=1)
 write.table(final_founder_table,file=glue('./output/combined_founder_variants_table.{Sys.Date()}.csv'),row.names = F,quote = F,sep='\t')
 
+# write combined table without duplicates
+final_founder_table_no_dups<-
+  final_founder_table%>%
+  group_by(chr,start,end,genomic_ref,genomic_alt,assembly_name,hgvsc,hgvsp)%>%
+  summarize(source=paste0(source,collapse=';'))
 
+write.table(final_founder_table_no_dups,file=glue('./output/combined_founder_variants_table.no_duplicates.{Sys.Date()}.csv'),row.names = F,quote = F,sep='\t')
+
+xlsx::write.xlsx2(final_founder_table_no_dups%>%as.data.frame(),
+                  file=glue('./output/combined_founder_variants_table.no_duplicates.{Sys.Date()}.xlsx'),
+                  sheetName = 'founder-variants',
+                  row.names = F)
 ```
 
 # adding franklin links to zlotogora table

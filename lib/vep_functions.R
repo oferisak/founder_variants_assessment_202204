@@ -49,9 +49,13 @@ gene_synonyms<-readr::read_delim('/media/SSD/Bioinformatics/Databases/ncbi/Homo_
 #   )%>%
 #   filter(!duplicated(Symbol))
 
-vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic_effect=TRUE){
-  gene_symbol_or_refseq<-ifelse(!is.na(variant$transcript) & variant$transcript!='','refseq','gene_symbol')
-  variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
+vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic_effect=TRUE,validate_by_cds=TRUE){
+  if (grepl('g\\.',variant$hgvs_notation)){
+    gene_symbol_or_refseq<-'genomic'
+  }else{
+    gene_symbol_or_refseq<-ifelse(!is.na(variant$transcript) & variant$transcript!='','refseq','gene_symbol')
+  }
+  variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq,distinct_genomic_effect,validate_by_cds)
   # if the transcript is not found, perhaps the transcript is too old, try a newer version
   if (('error' %in% colnames(variant_position)) &&
       grepl('Could not get a Transcript object',variant_position$error) &&
@@ -64,7 +68,7 @@ vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic
         newer_isoform<-glue('{transcript_without_isoform}.{i}')
         message(glue('VEP: Could not find transcript {original_transcript}, trying with {newer_isoform}'))
         variant$hgvs_notation<-glue('{newer_isoform}:{variant$variant}')
-        variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq)
+        variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq.distinct_genomic_effect,validate_by_cds)
         if (!('error' %in% colnames(variant_position))){
           break
         }
@@ -72,10 +76,12 @@ vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic
     }else{message(glue('VEP: transcript provided without an isoform {original_transcript}, will look for gene.'))}
   }
   # if the transcript is not found, and there is a gene symbol, try using it instead
-  if (('error' %in% colnames(variant_position)) && gene_symbol_or_refseq=='refseq' && grepl('Could not get a Transcript object',variant_position$error) && (variant$gene!='' & !is.na(variant$gene))){
+  if (('error' %in% colnames(variant_position)) && 
+      gene_symbol_or_refseq=='refseq' && 
+      (variant$gene!='' & !is.na(variant$gene))){
     variant$hgvs_notation<-glue('{variant$gene}:{variant$variant}')
     gene_symbol_or_refseq<-'gene_symbol'
-    variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq)
+    variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq=gene_symbol_or_refseq,distinct_genomic_effect,validate_by_cds)
   }
   
   # if the variant is an insertion and the error suggests ambiguity, try changing it to dup
@@ -83,7 +89,7 @@ vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic
       original_hgvs_notation<-variant$hgvs_notation
       variant$hgvs_notation<-stringr::str_replace(variant$hgvs_notation,'(I|i)ns','dup')
       message(glue('VEP: parsing failed, will retry with {variant$hgvs_notation} instead of {original_hgvs_notation}'))
-      variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq)
+      variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build,gene_symbol_or_refseq = gene_symbol_or_refseq,distinct_genomic_effect,validate_by_cds)
   }
   # if a gene symbol is not found, try other synonyms of the gene
   if (('error' %in% colnames(variant_position)) && 
@@ -93,7 +99,7 @@ vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic
     for (gene_synonym in gene_syn$Synonyms%>%stringr::str_split('\\|')%>%unlist()){
       message(glue('VEP: Could not find gene_symbol {variant$gene}, trying with {gene_synonym}'))
       variant$hgvs_notation<-glue('{gene_synonym}:{variant$variant}')
-      variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq='gene_symbol')
+      variant_position<-vep_hgvs_notation(variant%>%pull(hgvs_notation),build='grch37',gene_symbol_or_refseq='gene_symbol',distinct_genomic_effect,validate_by_cds)
       if (!('error' %in% colnames(variant_position))){
         break
       }
@@ -104,7 +110,7 @@ vep_cds_to_genomic_coordinates<-function(variant,build='grch37',distinct_genomic
 
 
 
-vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,distinct_genomic_effect=TRUE){
+vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,distinct_genomic_effect,validate_by_cds){
   if (build=='grch37'){
     server <- "https://grch37.rest.ensembl.org"
   }else{
@@ -172,7 +178,7 @@ vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,d
     res$is_canonical<-0
   }
   # match cds start
-  if ('hgvsc' %in% colnames(res)){
+  if (('hgvsc' %in% colnames(res)) & validate_by_cds){
     res<-res%>%
       mutate(original_cds_start=stringr::str_replace(hgvs_notation,'.+c\\.+','')%>%stringr::str_extract('\\d+'),
              annotation_cds_start=stringr::str_replace(hgvsc,'.+c\\.+','')%>%stringr::str_extract('\\d+'))%>%
