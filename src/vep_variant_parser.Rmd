@@ -453,13 +453,15 @@ moh_ws_for_merge<-moh_ws_vep_annotated%>%
          source='moh_ws')%>%
   select(all_of(cols_for_comp))
 
-founders_for_merge<-readr::read_delim('./output/combined_founder_variants_table.2024-07-17.csv')%>%
+founders_for_merge<-readr::read_delim('./output/combined_founder_variants_table.2024-07-31.csv')%>%
   mutate(original_hgvs_notation=original_hgvsc,
          cds_change=stringr::str_extract(hgvsc,'c\\..+'),
          transcript=stringr::str_replace(hgvsc,':.+',''),
          gene_hgvs=glue('{gene_symbol}:{cds_change}'),
          transcript_hgvs=glue('{transcript}:{cds_change}'))%>%
   select(all_of(cols_for_comp))%>%distinct()
+# make sure the MOH ws is not in the founders for merege 
+founders_for_merge<-founders_for_merge%>%filter(source!='moh_unified_screen')
 
 # comparison by location
 moh_ws_for_merge<-moh_ws_for_merge%>%
@@ -524,24 +526,12 @@ merged_list<-merged_list%>%
     location_or_transcript_found==0 & source!='moh_ws'~'founder_not_in_moh_ws',
     ))
 
-xlsx::write.xlsx2(moh_ws_ambiguous_table%>%
-                    select(original_hgvs_notation,
-                           original_transcript=transcript,
-                           hgvs_notation,
-                           transcript_id,
-                           chr,start,end,ref,alt,
-                           hgvsp)%>%
-                    as.data.frame(),
-                  file=glue('./output/moh_ws_comparison_table.{Sys.Date()}.xlsx'),
-                  sheetName = 'ambiguous_variants',
-                  row.names = F)
-
 xlsx::write.xlsx2(merged_list%>%
                     as.data.frame(),
                   file=glue('./output/moh_ws_comparison_table.{Sys.Date()}.xlsx'),
                   sheetName = 'moh_ws_vs_full_list',
                   row.names = F,
-                  append = T)
+                  append = F)
 
   
 ```
@@ -621,13 +611,21 @@ final_founder_table<-
   filter(!is.na(chr))%>%
   filter(is.na(error))%>%
   filter(is.na(is_ambiguous)|is_ambiguous!=1)
+# validate start end order
+final_founder_table<-
+  final_founder_table%>%mutate(old_start=start,old_end=end,
+                    start=ifelse(old_start>old_end,old_end,old_start),
+                    end=ifelse(old_start>old_end,old_start,old_end))%>%
+    select(-c(old_start,old_end))
 write.table(final_founder_table,file=glue('./output/combined_founder_variants_table.{Sys.Date()}.csv'),row.names = F,quote = F,sep='\t')
 
 # write combined table without duplicates
 final_founder_table_no_dups<-
   final_founder_table%>%
-  group_by(chr,start,end,genomic_ref,genomic_alt,assembly_name,hgvsc,hgvsp)%>%
+  group_by(chr,start,end,genomic_ref,genomic_alt,assembly_name,gene_symbol,hgvsc,hgvsp)%>%
   summarize(source=paste0(source,collapse=';'))
+
+
 
 write.table(final_founder_table_no_dups,file=glue('./output/combined_founder_variants_table.no_duplicates.{Sys.Date()}.csv'),row.names = F,quote = F,sep='\t')
 
@@ -635,6 +633,13 @@ xlsx::write.xlsx2(final_founder_table_no_dups%>%as.data.frame(),
                   file=glue('./output/combined_founder_variants_table.no_duplicates.{Sys.Date()}.xlsx'),
                   sheetName = 'founder-variants',
                   row.names = F)
+
+# write bed file
+bed_founders_no_dups<-final_founder_table_no_dups%>%
+  ungroup()%>%
+  select(chr,start,end,gene_symbol,hgvsc)
+
+write.table(bed_founders_no_dups,file=glue('./output/combined_founder_variants_table.no_duplicates.{Sys.Date()}.bed'),row.names = F,col.names = F,quote = F,sep='\t')
 ```
 
 # adding franklin links to zlotogora table

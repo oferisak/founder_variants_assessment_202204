@@ -239,6 +239,12 @@ vep_hgvs_notation<-function(hgvs_notation,build='grch37',gene_symbol_or_refseq,d
       res<-res%>%select(-all_of(uc))
     }
   }
+  # make sure start is smaller than end
+  res<-res%>%mutate(old_start=start,old_end=end,
+                    start=ifelse(old_start>old_end,old_end,old_start),
+                    end=ifelse(old_start>old_end,old_start,old_end))%>%
+    select(-c(old_start,old_end))
+  
   message(glue('VEP: found {nrow(res)} matching variants'))
   return(res)
 }
